@@ -1,19 +1,12 @@
-from .scrapy_request_builder import ScrapyRequest
+from .search_rule import Rule
 
 
 class Scheduler:
     database_is_empty = False
 
     def fetch_request(self):
-        url = 'http://www.baidu.com/'
-        keywords = '猫'
+        rule = Rule('baidu', '猫')
 
-        if self.database_is_empty:
-            self.database_is_empty = not self.database_is_empty
-            return None
-
-        scrapy_request = ScrapyRequest(url, keywords)
-
+        scrapy_requests = [] if self.database_is_empty else rule.scrapy_requests
         self.database_is_empty = not self.database_is_empty
-
-        return scrapy_request
+        return scrapy_requests

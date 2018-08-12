@@ -15,13 +15,29 @@ SPIDER_MODULES = ['search_engine_crawler.spiders']
 NEWSPIDER_MODULE = 'search_engine_crawler.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = 'search_engine_crawler (+http://www.yourdomain.com)'
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
+             "AppleWebKit/537.36 (KHTML, like Gecko) " \
+             "Chrome/61.0.3163.100 Safari/537.36"
+
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+# 广度优先
+# DEPTH_PRIORITY = 1
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 100
+
+REACTOR_THREADPOOL_MAXSIZE = 20
+
+LOG_LEVEL = 'INFO'
+
+COOKIES_ENABLED = False
+
+RETRY_ENABLED = False
+
+DOWNLOAD_TIMEOUT = 15
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay

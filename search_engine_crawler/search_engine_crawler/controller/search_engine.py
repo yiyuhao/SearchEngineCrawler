@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from math import ceil
 
 
@@ -51,6 +52,8 @@ class SearchEngine:
 
         for key, value in self.item.items():
             setattr(self, key, value)
+
+        self.base_url = urlparse(self.search_url).netloc
 
     def start_urls(self, search_num: int, search_keywords: str):
         """

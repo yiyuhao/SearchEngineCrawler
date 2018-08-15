@@ -19,7 +19,6 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
              "AppleWebKit/537.36 (KHTML, like Gecko) " \
              "Chrome/61.0.3163.100 Safari/537.36"
 
-
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
@@ -37,7 +36,7 @@ COOKIES_ENABLED = False
 
 RETRY_ENABLED = False
 
-DOWNLOAD_TIMEOUT = 15
+DOWNLOAD_TIMEOUT = 30
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -103,3 +102,5 @@ DOWNLOAD_TIMEOUT = 15
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+email_regex = r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)'

@@ -16,6 +16,7 @@ class SearchEngineSpider(scrapy.Spider):
             for request in scrapy_requests:
                 print(f'send a crawl request.. {request.url}')
                 yield request
+            break
 
     def parse(self, response):
         pass

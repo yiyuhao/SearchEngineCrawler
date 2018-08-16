@@ -5,7 +5,7 @@ from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, L
 from scrapy.linkextractor import LinkExtractor
 
 from .search_engine import SearchEngine
-from utils import match_email
+from utils import match_email, strip_tags
 
 
 class Rule:
@@ -27,38 +27,39 @@ class Rule:
         """all search engine page"""
 
         def craw_website(response):
-            """www.miqilin.com"""
 
-            page_text = response.text
+            # clean html(script, style, html tags)
+            page_text = strip_tags(response.text)
 
             # match phone number
-            # todo  clean html   delete element src, href and so on
             for match in PhoneNumberMatcher(page_text, region='US', leniency=Leniency.POSSIBLE):
                 phone_number = format_number(match.number, PhoneNumberFormat.INTERNATIONAL)
-                print(phone_number)
+                print(f'find phone: {phone_number}')
 
             # match email
             for email in match_email(page_text):
-                print(email)
+                print(f'find email: {email}')
 
             # follow url
             site_domain = urlparse(response.url).netloc
 
-            # todo extract url from href
             link_extractor = LinkExtractor(allow_domains=(site_domain,))
             links = link_extractor.extract_links(response)
 
-            for link in links:
-                yield scrapy.Request(url=link.url, callback=craw_website)
+            # limit depth(each website url is only allowed to follow once)
+            if response.meta['depth'] <= 1:
+                for link in links:
+                    print(f'yield a site link: {link.url}')
+                    yield scrapy.Request(url=link.url, callback=craw_website)
 
         def parse_search_result_page(response):
             """www.google.com"""
-            print('download finished')
-
             links = self.link_extractor.extract_links(response)
 
             for link in links:
+                print(f'yield a baidu link: {link.url}')
                 yield scrapy.Request(url=link.url, callback=craw_website)
+                break
 
         scrapy_requests = (scrapy.Request(url=url, callback=parse_search_result_page) for url in self.start_urls)
         return scrapy_requests

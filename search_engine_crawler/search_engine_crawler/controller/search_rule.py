@@ -5,7 +5,7 @@ from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, L
 from scrapy.linkextractor import LinkExtractor
 
 from .search_engine import SearchEngine
-from utils import match_email, strip_tags
+from utils import match_email, strip_tags, search_contact_us
 
 
 class Rule:
@@ -28,29 +28,57 @@ class Rule:
 
         def craw_website(response):
 
-            # clean html(script, style, html tags)
-            page_text = strip_tags(response.text)
+            def find_information():
+                # clean html(script, style, html tags)
+                page_text = strip_tags(response.text)
 
-            # match phone number
-            for match in PhoneNumberMatcher(page_text, region='US', leniency=Leniency.POSSIBLE):
-                phone_number = format_number(match.number, PhoneNumberFormat.INTERNATIONAL)
-                print(f'find phone: {phone_number}')
+                # match phone number
+                for match in PhoneNumberMatcher(page_text, region='US', leniency=Leniency.POSSIBLE):
+                    phone_number = format_number(match.number, PhoneNumberFormat.INTERNATIONAL)
+                    print(f'find phone: {phone_number}')
+                    meta['phone_number'].add(phone_number)
 
-            # match email
-            for email in match_email(page_text):
-                print(f'find email: {email}')
+                # match email
+                for email in match_email(page_text):
+                    print(f'find email: {email}')
+                    meta['email'].add(email)
 
-            # follow url
-            site_domain = urlparse(response.url).netloc
+            need_follow = response.meta['depth'] <= 1
 
-            link_extractor = LinkExtractor(allow_domains=(site_domain,))
-            links = link_extractor.extract_links(response)
+            # meta save the site information
+            meta = dict(
+                phone_number=response.meta.get('phone_number', set()),
+                email=response.meta.get('email', set())
+            )
 
-            # limit depth(each website url is only allowed to follow once)
-            if response.meta['depth'] <= 1:
-                for link in links:
-                    print(f'yield a site link: {link.url}')
-                    yield scrapy.Request(url=link.url, callback=craw_website)
+            if need_follow:
+
+                contact_page_urls = search_contact_us(response.text)
+
+                # first, search contact-us page
+                if contact_page_urls:
+                    for url in contact_page_urls:
+                        print(f'yield a site link: {url}')
+                        yield response.follow(url=url, callback=craw_website)
+
+                # else fallow all urls
+                else:
+
+                    find_information()
+
+                    # follow url
+                    site_domain = urlparse(response.url).netloc
+
+                    link_extractor = LinkExtractor(allow_domains=(site_domain,))
+                    links = link_extractor.extract_links(response)
+
+                    # limit depth(each website url is only allowed to follow once)
+                    if response.meta['depth'] <= 1:
+                        for link in links:
+                            print(f'yield a site link: {link.url}')
+                            yield scrapy.Request(url=link.url, callback=craw_website, meta=meta)
+            else:
+                find_information()
 
         def parse_search_result_page(response):
             """www.google.com"""

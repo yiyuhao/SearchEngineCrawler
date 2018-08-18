@@ -62,7 +62,7 @@ class SearchEngine:
         :return: (Iter) urls for crawling
         """
         max_page = int(ceil(search_num / 10))
-        page_params = (eval(self.page_param.format(page)) for page in range(1, max_page + 1))
+        page_params = (eval(self.page_param.format(page)) for page in range(max_page))
 
         return (
             self.search_url.format(

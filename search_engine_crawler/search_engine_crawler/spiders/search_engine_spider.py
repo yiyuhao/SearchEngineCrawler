@@ -1,5 +1,4 @@
 import scrapy
-from time import sleep
 
 from controller.take_scheduler import Scheduler
 

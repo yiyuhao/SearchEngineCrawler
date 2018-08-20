@@ -6,6 +6,7 @@ from scrapy.utils.request import request_fingerprint
 
 from . import defaults
 from .connection import get_redis_from_settings
+from settings import FINGERPRINT_TTL
 
 
 logger = logging.getLogger(__name__)
@@ -95,9 +96,20 @@ class RFPDupeFilter(BaseDupeFilter):
         bool
 
         """
+        # yiyuhao
+        # use sorted set to set TTL of fingerprint
         fp = self.request_fingerprint(request)
+
+        now = time.time()
+        expired_time = now + FINGERPRINT_TTL
+
+        # clear expired fingerprint
+        self.server.zremrangebyscore(self.key, 0, now)
+
+        added = self.server.zadd(self.key, expired_time, fp)
+
         # This returns the number of values added, zero if already exists.
-        added = self.server.sadd(self.key, fp)
+        # added = self.server.sadd(self.key, fp)
         return added == 0
 
     def request_fingerprint(self, request):

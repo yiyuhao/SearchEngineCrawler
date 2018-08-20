@@ -40,6 +40,9 @@ REDIS_ENCODING = 'utf-8'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+# TTL of request fingerprint (url dupefilter) in redis sorted set.
+FINGERPRINT_TTL = 3 * 60
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
 

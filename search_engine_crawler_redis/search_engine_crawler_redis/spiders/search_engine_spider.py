@@ -42,7 +42,7 @@ class SearchEngineSpider(RedisSpider):
         links = link_extractor.extract_links(response)
 
         for link in links:
-            print(f'yield a baidu link: {link.url}')
+            print(f'yield a search engine link: {link.url}')
             yield scrapy.Request(url=link.url, callback=self.craw_website)
             break
 
@@ -55,12 +55,13 @@ class SearchEngineSpider(RedisSpider):
             # match phone number
             for match in PhoneNumberMatcher(page_text, region='US', leniency=Leniency.POSSIBLE):
                 phone_number = format_number(match.number, PhoneNumberFormat.INTERNATIONAL)
-                print(f'find phone: {phone_number}')
+                print(f'find phone: {phone_number} from {response.url}')
                 meta['phone_number'].add(phone_number)
 
             # match email
             for email in match_email(page_text):
-                print(f'find email: {email}')
+                email = email.group()
+                print(f'find email: {email} from {response.url}')
                 meta['email'].add(email)
 
         need_follow = response.meta['depth'] <= 1
@@ -78,7 +79,7 @@ class SearchEngineSpider(RedisSpider):
             # first, search contact-us page
             if contact_page_urls:
                 for url in contact_page_urls:
-                    print(f'yield a site link: {url}')
+                    print(f'find contact-us page, yield a site link: {url}')
                     yield response.follow(url=url, callback=self.craw_website)
 
             # else fallow all urls

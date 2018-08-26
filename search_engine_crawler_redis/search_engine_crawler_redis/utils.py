@@ -9,8 +9,11 @@ cleaner.javascript = True
 cleaner.style = True
 
 pattern_a_tag = re.compile(r'(<a.*?</a>)', re.IGNORECASE)
-pattern_contact_up = re.compile(r'contact', re.IGNORECASE)
+pattern_contact_up = re.compile(r'contact|联系', re.IGNORECASE)
 pattern_href = re.compile(r'<a.*?href=[\'"](.*?)[\'"].*</a>', re.IGNORECASE)
+
+# the result of search engine that needed filter
+pattern_ignore = re.compile(r'baidu|wiki|baike')
 
 
 class HTMLStripper(HTMLParser):
@@ -58,3 +61,8 @@ def search_contact_us(text) -> set:
                 contact_a_tags.add(match_href.group(1))
 
     return contact_a_tags
+
+
+def need_ignoring(url):
+    """filter search engine result url, exclude baike, wiki and so on"""
+    return True if pattern_ignore.match(url) else False

@@ -6,7 +6,7 @@ from scrapy.linkextractor import LinkExtractor
 from scrapy_redis.spiders import RedisSpider
 
 from controller.take_scheduler import Scheduler
-from utils import match_email, strip_tags, search_contact_us
+from utils import match_email, strip_tags, search_contact_us, need_ignoring
 
 
 class SearchEngineSpider(RedisSpider):
@@ -36,15 +36,15 @@ class SearchEngineSpider(RedisSpider):
             self.logger.debug("Read %s requests", request_num)
 
     def parse_search_result_page(self, response):
-        """www.google.com"""
+        """parse search engine result"""
 
         link_extractor = LinkExtractor(restrict_css=response.meta['engine_selector'])
         links = link_extractor.extract_links(response)
 
         for link in links:
-            print(f'yield a search engine link: {link.url}')
-            yield scrapy.Request(url=link.url, callback=self.craw_website)
-            break
+            if not need_ignoring(link.url):
+                print(f'yield a search engine link: {link.url}')
+                yield scrapy.Request(url=link.url, callback=self.craw_website)
 
     def craw_website(self, response):
 

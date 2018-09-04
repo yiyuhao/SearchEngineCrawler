@@ -65,4 +65,4 @@ def search_contact_us(text) -> set:
 
 def need_ignoring(url):
     """filter search engine result url, exclude baike, wiki and so on"""
-    return True if pattern_ignore.match(url) else False
+    return True if pattern_ignore.search(url) else False

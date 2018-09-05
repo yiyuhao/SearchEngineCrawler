@@ -14,10 +14,9 @@ class SearchEngineCrawlerRedisItem(scrapy.Item):
     pass
 
 
-class LagouJobItem(scrapy.Item):
-    """拉勾网职位信息"""
+class SearchResultItem(scrapy.Item):
 
-    title = scrapy.Field()
+    search_request_id = scrapy.Field()
     url = scrapy.Field()
     url_object_id = scrapy.Field()
     salary = scrapy.Field()

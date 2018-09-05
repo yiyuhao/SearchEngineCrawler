@@ -7,6 +7,7 @@
 
 import MySQLdb
 import MySQLdb.cursors
+from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
 
 
@@ -35,13 +36,8 @@ class MysqlTwistedPipeline(object):
 
         return cls(db_pool)
 
-    def process_item(self, item, spider):
-        """async SQL insert with Twisted"""
-        query = self.db_pool.runInteraction(self.do_insert, item)
-        query.addErrback(self.handle_error, item, spider)
-        return item
-
-    def do_insert(self, cursor, item):
+    @staticmethod
+    def _do_insert(cursor, item):
         """
             根据不同item构建不同sql，执行具体的插入
         """
@@ -49,6 +45,28 @@ class MysqlTwistedPipeline(object):
         insert_sql, sql_params = item.sql
         cursor.execute(insert_sql, sql_params)
 
+    def process_item(self, item, spider):
+        """async SQL insert with Twisted"""
+        query = self.db_pool.runInteraction(self._do_insert, item)
+        query.addErrback(self.handle_error, item, spider)
+        return item
+
     def handle_error(self, failure, item, spider):
         """处理异步插入的异常"""
         print(failure)
+
+
+class DuplicatesPipeline(object):
+
+    def __init__(self):
+        self.ids_seen = set()
+
+    def process_item(self, item, spider):
+        if item['id'] in self.ids_seen:
+            raise DropItem("Duplicate item found: %s" % item)
+        else:
+            self.ids_seen.add(item['id'])
+            return item
+
+# todo redis pipeline
+# search_request_collection_number: {request_id: number}

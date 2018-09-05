@@ -44,7 +44,8 @@ class SearchEngineSpider(RedisSpider):
         for link in links:
             if not need_ignoring(link.url):
                 print(f'yield a search engine link: {link.url}')
-                yield scrapy.Request(url=link.url, callback=self.craw_website)
+                yield scrapy.Request(url=link.url, callback=self.craw_website, meta=response.meta)
+                break
 
     def craw_website(self, response):
 

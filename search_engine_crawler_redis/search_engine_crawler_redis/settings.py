@@ -17,6 +17,7 @@ NEWSPIDER_MODULE = 'search_engine_crawler_redis.spiders'
 # Enables scheduling storing requests queue in redis.
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
+# Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
              "AppleWebKit/537.36 (KHTML, like Gecko) " \
              "Chrome/61.0.3163.100 Safari/537.36"
@@ -24,18 +25,24 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
 # Ensure all spiders share same duplicates filter through redis.
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
-ITEM_PIPELINES = {
-    'scrapy_redis.pipelines.RedisPipeline': 300
-}
-
 # Specify the host and port to use when connecting to Redis (optional).
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 
 REDIS_ENCODING = 'utf-8'
 
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
-# USER_AGENT = 'search_engine_crawler_redis (+http://www.yourdomain.com)'
+# mysql
+MYSQL_HOST = 'localhost'
+MYSQL_DATABASE = 'ses'
+MYSQL_USER = 'root'
+MYSQL_PASSWORD = '$4qweqwe'
+
+# Configure item pipelines
+# See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+ITEM_PIPELINES = {
+    'search_engine_crawler_redis.pipelines.MysqlTwistedPipeline': 100,
+    'search_engine_crawler_redis.pipelines.SearchEngineCrawlerRedisPipeline': 300,
+}
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -82,12 +89,6 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
 # EXTENSIONS = {
 #    'scrapy.extensions.telnet.TelnetConsole': None,
-# }
-
-# Configure item pipelines
-# See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'search_engine_crawler_redis.pipelines.SearchEngineCrawlerRedisPipeline': 300,
 # }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

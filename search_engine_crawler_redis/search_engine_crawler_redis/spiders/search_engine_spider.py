@@ -1,12 +1,12 @@
 from urllib.parse import urlparse
 
 import scrapy
-from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, Leniency
 from scrapy.linkextractor import LinkExtractor
 from scrapy_redis.spiders import RedisSpider
 
 from controller.take_scheduler import Scheduler
-from utils import match_email, strip_tags, search_contact_us, need_ignoring
+from controller.item_builder import ItemBuilder
+from utils import search_contact_us, need_ignoring
 
 
 class SearchEngineSpider(RedisSpider):
@@ -49,55 +49,37 @@ class SearchEngineSpider(RedisSpider):
 
     def craw_website(self, response):
 
-        def find_information():
-            # clean html(script, style, html tags)
-            page_text = strip_tags(response.text)
+        item_builder = ItemBuilder(response)
 
-            # match phone number
-            for match in PhoneNumberMatcher(page_text, region='US', leniency=Leniency.POSSIBLE):
-                phone_number = format_number(match.number, PhoneNumberFormat.INTERNATIONAL)
-                print(f'find phone: {phone_number} from {response.url}')
-                meta['phone_number'].add(phone_number)
+        # filter website by filter_words or inclusion_words
+        if item_builder.need_search:
 
-            # match email
-            for email in match_email(page_text):
-                email = email.group()
-                print(f'find email: {email} from {response.url}')
-                meta['email'].add(email)
+            if response.meta['depth'] <= 1:  # need follow all urls in this page
 
-        need_follow = response.meta['depth'] <= 1
+                contact_page_urls = search_contact_us(response.text)
 
-        # meta save the site information
-        meta = dict(
-            phone_number=response.meta.get('phone_number', set()),
-            email=response.meta.get('email', set())
-        )
+                # if contact-us page existed, only search contact-us page
+                if contact_page_urls:
+                    for url in contact_page_urls:
+                        print(f'find contact-us page, yield a site link: {url}')
+                        yield response.follow(url=url, callback=self.craw_website, meta=response.meta)
+                        break
 
-        if need_follow:
+                # else find result, then search all pages
+                else:
 
-            contact_page_urls = search_contact_us(response.text)
+                    for search_result_item in item_builder.build_items():
+                        yield search_result_item
 
-            # first, search contact-us page
-            if contact_page_urls:
-                for url in contact_page_urls:
-                    print(f'find contact-us page, yield a site link: {url}')
-                    yield response.follow(url=url, callback=self.craw_website)
+                    # follow url
+                    site_domain = urlparse(response.url).netloc
 
-            # else fallow all urls
-            else:
+                    link_extractor = LinkExtractor(allow_domains=(site_domain,))
+                    links = link_extractor.extract_links(response)
 
-                find_information()
-
-                # follow url
-                site_domain = urlparse(response.url).netloc
-
-                link_extractor = LinkExtractor(allow_domains=(site_domain,))
-                links = link_extractor.extract_links(response)
-
-                # limit depth(each website url is only allowed to follow once)
-                if response.meta['depth'] <= 1:
                     for link in links:
                         print(f'yield a site link: {link.url}')
-                        yield scrapy.Request(url=link.url, callback=self.craw_website, meta=meta)
-        else:
-            find_information()
+                        yield scrapy.Request(url=link.url, callback=self.craw_website, meta=response.meta)
+            else:
+                for search_result_item in item_builder.build_items():
+                    yield search_result_item

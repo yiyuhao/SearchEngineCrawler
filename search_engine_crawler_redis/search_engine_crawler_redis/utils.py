@@ -28,7 +28,7 @@ class HTMLStripper(HTMLParser):
         self.fed.append(d.strip())
 
     def get_data(self):
-        return '***'.join(self.fed)
+        return '*'.join(self.fed)
 
 
 def strip_tags(html_text):

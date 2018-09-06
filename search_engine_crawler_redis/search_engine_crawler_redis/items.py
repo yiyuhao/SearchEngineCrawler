@@ -15,32 +15,27 @@ class SearchEngineCrawlerRedisItem(scrapy.Item):
 
 
 class SearchResultItem(scrapy.Item):
-
     search_request_id = scrapy.Field()
-    url = scrapy.Field()
-    url_object_id = scrapy.Field()
-    salary = scrapy.Field()
-    job_type = scrapy.Field()
-    publish_time = scrapy.Field()
-    job_advantage = scrapy.Field()
-    job_desc = scrapy.Field()
-    company_name = scrapy.Field()
-    company_url = scrapy.Field()
-    crawl_time = scrapy.Field()
+    domain_name = scrapy.Field()
+    mailbox = scrapy.Field()
+    phone = scrapy.Field()
+    website_title = scrapy.Field()
+    website_ntroduction = scrapy.Field()
+    facebook = scrapy.Field()
+    skype = scrapy.Field()
 
-    def get_insert_sql(self):
-        insert_sql = """
-            insert into lagou_job(title, url, url_object_id, salary, job_city, work_years, degree_need,
-            job_type, publish_time, job_advantage, job_desc, job_addr, company_name, company_url,
-            tags, crawl_time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE salary=VALUES(salary), job_desc=VALUES(job_desc)
-        """
+    @property
+    def sql(self):
+        insert_sql = '''
+            insert into search_details(search_request_id, domain_name, mailbox, 
+            phone, website_title, website_ntroduction, 
+            facebook, skype) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        '''
         params = (
-            self["title"], self["url"], self["url_object_id"], self["salary"], self["job_city"],
-            self["work_years"], self["degree_need"], self["job_type"],
-            self["publish_time"], self["job_advantage"], self["job_desc"],
-            self["job_addr"], self["company_name"], self["company_url"],
-            self["job_addr"], self["crawl_time"],
+            self['search_request_id'], self.get('domain_name', None), self.get('mailbox', None),
+            self.get('phone', None), self.get('website_title', None), self.get('website_ntroduction', None),
+            self.get('facebook', None), self.get('skype', None)
         )
 
         return insert_sql, params

@@ -40,7 +40,8 @@ MYSQL_PASSWORD = '$4qweqwe'
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'search_engine_crawler_redis.pipelines.MysqlTwistedPipeline': 100,
+    'search_engine_crawler_redis.pipelines.DuplicatesPipeline': 100,
+    'search_engine_crawler_redis.pipelines.MysqlTwistedPipeline': 200,
     'search_engine_crawler_redis.pipelines.SearchEngineCrawlerRedisPipeline': 300,
 }
 
@@ -49,6 +50,7 @@ ROBOTSTXT_OBEY = False
 
 # TTL of request fingerprint (url dupefilter) in redis sorted set.
 FINGERPRINT_TTL = 3 * 60
+SEARCH_RESULT_ITEM_TTL = 10 * 60
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32

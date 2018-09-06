@@ -1,8 +1,15 @@
-import re
-from html.parser import HTMLParser
-from lxml.html.clean import Cleaner
 
-from settings import email_regex
+import json
+import re
+import time
+from html.parser import HTMLParser
+
+from lxml.html.clean import Cleaner
+from scrapy_redis.connection import get_redis_from_settings
+
+from scrapy.crawler import Settings
+
+from settings import email_regex, SEARCH_RESULT_ITEM_TTL
 
 cleaner = Cleaner()
 cleaner.javascript = True
@@ -66,3 +73,23 @@ def search_contact_us(text) -> set:
 def need_ignoring(url):
     """filter search engine result url, exclude baike, wiki and so on"""
     return True if pattern_ignore.search(url) else False
+
+
+class SearchResultDupefilter:
+
+    def __init__(self):
+        self.server = get_redis_from_settings(Settings())
+        self.key = f'search_result_item_dupefilter'
+
+    def seen(self, item):
+        """check if item already existed"""
+
+        now = time.time()
+        expired_time = now + SEARCH_RESULT_ITEM_TTL
+
+        # clear expired item
+        self.server.zremrangebyscore(self.key, 0, now)
+
+        added = self.server.zadd(self.key, expired_time, json.dumps(dict(item)))
+
+        return added == 0

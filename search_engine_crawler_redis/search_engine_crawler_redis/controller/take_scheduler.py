@@ -15,7 +15,7 @@ class Scheduler:
         # 机械配件：Machinery Parts
         # 手机配件：Mobile phone accessories
         rule = Rule(self.spider, 'bing',
-                    search_request_id=10, search_keywords='轴承', collection_number=1)
+                    search_request_id=10, search_keywords='Mobile phone accessories', collection_number=1)
 
         scrapy_requests = [] if self.database_is_empty else rule.scrapy_requests
         self.database_is_empty = True

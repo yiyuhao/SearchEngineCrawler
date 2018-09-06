@@ -10,9 +10,22 @@ import MySQLdb.cursors
 from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
 
+from utils import SearchResultDupefilter
+
 
 class SearchEngineCrawlerRedisPipeline(object):
     def process_item(self, item, spider):
+        return item
+
+
+class DuplicatesPipeline(object):
+
+    def __init__(self):
+        self.dupefilter = SearchResultDupefilter()
+
+    def process_item(self, item, spider):
+        if self.dupefilter.seen(item):
+            raise DropItem("Duplicate item found: %s" % item)
         return item
 
 
@@ -54,19 +67,6 @@ class MysqlTwistedPipeline(object):
     def handle_error(self, failure, item, spider):
         """处理异步插入的异常"""
         print(failure)
-
-
-class DuplicatesPipeline(object):
-
-    def __init__(self):
-        self.ids_seen = set()
-
-    def process_item(self, item, spider):
-        if item['id'] in self.ids_seen:
-            raise DropItem("Duplicate item found: %s" % item)
-        else:
-            self.ids_seen.add(item['id'])
-            return item
 
 # todo redis pipeline
 # search_request_collection_number: {request_id: number}

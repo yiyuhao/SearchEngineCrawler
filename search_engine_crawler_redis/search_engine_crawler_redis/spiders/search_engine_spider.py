@@ -17,6 +17,20 @@ class SearchEngineSpider(RedisSpider):
         super(SearchEngineSpider, self).__init__(*args, **kwargs)
         self.task_scheduler = Scheduler(self)
 
+    @staticmethod
+    def _find_search_engine_result_links(response):
+        link_extractor = LinkExtractor(restrict_css=response.meta['engine_selector'])
+        links = link_extractor.extract_links(response)
+        return links
+
+    @staticmethod
+    def _find_all_links(response):
+        site_domain = urlparse(response.url).netloc
+
+        link_extractor = LinkExtractor(allow_domains=(site_domain,))
+        links = link_extractor.extract_links(response)
+        return links
+
     def next_requests(self):
         """Returns a request to be scheduled or none."""
 
@@ -35,11 +49,10 @@ class SearchEngineSpider(RedisSpider):
         if request_num:
             self.logger.debug("Read %s requests", request_num)
 
-    def parse_search_result_page(self, response):
+    def parse_search_engine_result_page(self, response):
         """parse search engine result"""
 
-        link_extractor = LinkExtractor(restrict_css=response.meta['engine_selector'])
-        links = link_extractor.extract_links(response)
+        links = self._find_search_engine_result_links(response)
 
         for link in links:
             if not need_ignoring(link.url):
@@ -70,10 +83,7 @@ class SearchEngineSpider(RedisSpider):
                         yield search_result_item
 
                     # follow url
-                    site_domain = urlparse(response.url).netloc
-
-                    link_extractor = LinkExtractor(allow_domains=(site_domain,))
-                    links = link_extractor.extract_links(response)
+                    links = self._find_all_links(response)
 
                     for link in links:
                         print(f'yield a site link: {link.url}')

@@ -36,7 +36,7 @@ class Rule:
         scrapy_requests = (
             scrapy.Request(
                 url=url,
-                callback=self.spider.parse_search_result_page,
+                callback=self.spider.parse_search_engine_result_page,
                 meta=dict(
                     engine_selector=self.engine.result_selector,
                     search_request_id=self.search_request_id,

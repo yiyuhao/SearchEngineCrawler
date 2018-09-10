@@ -22,36 +22,42 @@ class Item:
 
 
 class SearchEngineConfig:
-    google = Item(
-        search_url='https://www.google.com/search?q={keywords}&start={page_param}',
-    )
+    config_dict = {
+        0: Item(
+            search_url='https://www.google.com/search?q={keywords}&start={page_param}',
+        ),
 
-    bing = Item(
-        search_url='http://www.bing.com/search?q={keywords}&first={page_param}',
-        result_selector='h2 > a',
-    )
+        1: Item(
+            search_url='http://www.bing.com/search?q={keywords}&first={page_param}',
+            result_selector='h2 > a',
+        ),
 
-    baidu = Item(
-        search_url='http://www.baidu.com/s?wd={keywords}&pn={page_param}',
-    )
+        2: Item(
+            search_url='http://www.baidu.com/s?wd={keywords}&pn={page_param}',
+        ),
 
-    yahoo = Item(
-        search_url='https://search.yahoo.com/search;?p={keywords}&b={page_param}',
-        page_param='{}*10 + 1'
-    )
+        3: Item(
+            search_url='https://search.yahoo.com/search;?p={keywords}&b={page_param}',
+            page_param='{}*10 + 1'
+        )
+    }
+
+
+search_engine_config = SearchEngineConfig().config_dict
 
 
 class SearchEngine:
 
-    def __init__(self, name: str):
-        if not hasattr(SearchEngineConfig, name):
-            raise ValueError(f'no search engine named {name}')
+    def __init__(self, country_id):
+        if country_id not in search_engine_config:
+            raise ValueError(f'no search engine with country_id: {country_id}')
 
-        self.name = name
-        self.item = getattr(SearchEngineConfig, name)
+        self.engine = search_engine_config[country_id]
 
-        for key, value in self.item.items():
-            setattr(self, key, value)
+        self.search_url = self.engine['search_url']
+        self.result_selector = self.engine['result_selector']
+        self.page_size = self.engine['page_size']
+        self.page_param = self.engine['page_param']
 
         self.base_url = urlparse(self.search_url).netloc
 

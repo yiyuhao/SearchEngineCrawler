@@ -5,14 +5,14 @@ from .search_engine import SearchEngine
 
 class Rule:
 
-    def __init__(self, spider, engine, search_request_id,
+    def __init__(self, spider, country_id, search_request_id,
                  search_keywords, collection_number=1,
                  filter_words=None, inclusion_words=None,
                  email_collection=True, phone_collection=True, url_collection=True,
                  facebook_collection=True, company_name_collection=True, company_profile_collection=True):
 
         self.spider = spider
-        self.engine = SearchEngine(engine)
+        self.engine = SearchEngine(country_id)
         self.search_request_id = search_request_id
         self.search_keywords = search_keywords
         self.collection_number = collection_number

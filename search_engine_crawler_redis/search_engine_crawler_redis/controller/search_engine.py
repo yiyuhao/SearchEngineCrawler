@@ -1,56 +1,56 @@
 from urllib.parse import urlparse
 from math import ceil
 
+from utils import get_search_engine_config
+#
+# class Item:
+#     def __new__(
+#             cls,
+#             search_url: str,
+#             result_selector: str = 'h3 > a',
+#             page_size: int = 10,
+#             page_param: str = '{}*10'
+#     ):
+#         return dict(
+#             search_url=search_url,
+#             result_selector=result_selector,
+#             page_size=page_size,
+#             page_param=page_param,
+#         )
+#
+#     def __getattr__(self, item):
+#         return self.__getitem__(item)
+#
+#
+# class SearchEngineConfig:
+#     config_dict = {
+#         0: Item(
+#             search_url='https://www.google.com/search?q={keywords}&start={page_param}',
+#         ),
+#
+#         1: Item(
+#             search_url='http://www.bing.com/search?q={keywords}&first={page_param}',
+#             result_selector='h2 > a',
+#         ),
+#
+#         2: Item(
+#             search_url='http://www.baidu.com/s?wd={keywords}&pn={page_param}',
+#         ),
+#
+#         3: Item(
+#             search_url='https://search.yahoo.com/search;?p={keywords}&b={page_param}',
+#             page_param='{}*10 + 1'
+#         )
+#     }
 
-class Item:
-    def __new__(
-            cls,
-            search_url: str,
-            result_selector: str = 'h3 > a',
-            page_size: int = 10,
-            page_param: str = '{}*10'
-    ):
-        return dict(
-            search_url=search_url,
-            result_selector=result_selector,
-            page_size=page_size,
-            page_param=page_param,
-        )
-
-    def __getattr__(self, item):
-        return self.__getitem__(item)
-
-
-class SearchEngineConfig:
-    config_dict = {
-        0: Item(
-            search_url='https://www.google.com/search?q={keywords}&start={page_param}',
-        ),
-
-        1: Item(
-            search_url='http://www.bing.com/search?q={keywords}&first={page_param}',
-            result_selector='h2 > a',
-        ),
-
-        2: Item(
-            search_url='http://www.baidu.com/s?wd={keywords}&pn={page_param}',
-        ),
-
-        3: Item(
-            search_url='https://search.yahoo.com/search;?p={keywords}&b={page_param}',
-            page_param='{}*10 + 1'
-        )
-    }
-
-
-search_engine_config = SearchEngineConfig().config_dict
+search_engine_config = get_search_engine_config()
 
 
 class SearchEngine:
 
     def __init__(self, country_id):
         if country_id not in search_engine_config:
-            raise ValueError(f'no search engine with country_id: {country_id}')
+            raise ValueError(f'no search engine found by country_id: {country_id}')
 
         self.engine = search_engine_config[country_id]
 

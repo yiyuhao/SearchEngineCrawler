@@ -1,4 +1,3 @@
-
 import json
 import re
 import time
@@ -6,9 +5,9 @@ from html.parser import HTMLParser
 
 from lxml.html.clean import Cleaner
 from scrapy_redis.connection import get_redis_from_settings
-
 from scrapy.crawler import Settings
 
+from controller.db_manager import NationalConfigurationDBManager
 from settings import email_regex, SEARCH_RESULT_ITEM_TTL
 
 cleaner = Cleaner()
@@ -73,6 +72,24 @@ def search_contact_us(text) -> set:
 def need_ignoring(url):
     """filter search engine result url, exclude baike, wiki and so on"""
     return True if pattern_ignore.search(url) else False
+
+
+def get_search_engine_config():
+    db = NationalConfigurationDBManager()
+    query_result = db.fetch()
+
+    config = {}
+
+    for engine in query_result:
+        country_id, search_engine_address, page_size, page_param, result_selector = engine
+        config[country_id] = dict(
+            search_url=search_engine_address,
+            page_size=page_size,
+            page_param=page_param,
+            result_selector=result_selector,
+        )
+
+    return config
 
 
 class SearchResultDupefilter:

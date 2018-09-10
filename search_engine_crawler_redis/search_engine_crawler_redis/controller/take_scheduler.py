@@ -1,12 +1,20 @@
 from .search_rule import Rule
+from controller.db_manager import SearchRequestDBManager
 
 
 class Scheduler:
 
     def __init__(self, spider):
         self.spider = spider
+        self.db_manager = SearchRequestDBManager()
 
-    database_is_empty = False
+    def _fetch_rules(self):
+        rules = []
+        db_query_result = self.db_manager.fetch_all()
+        for search_request in db_query_result:
+            rules.append(Rule(self.spider, *search_request))
+
+        # todo build requests
 
     def fetch_requests(self):
         # 轴承：Bearing

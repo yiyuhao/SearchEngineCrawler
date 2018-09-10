@@ -6,24 +6,24 @@ from .search_engine import SearchEngine
 class Rule:
 
     def __init__(self, spider, country_id, search_request_id,
-                 search_keywords, collection_number=1,
-                 filter_words=None, inclusion_words=None,
-                 email_collection=True, phone_collection=True, url_collection=True,
-                 facebook_collection=True, company_name_collection=True, company_profile_collection=True):
+                 search_keywords, collection_number,
+                 filter_words, inclusion_words,
+                 email_collection, phone_collection, url_collection,
+                 facebook_collection, company_name_collection, company_profile_collection):
 
         self.spider = spider
         self.engine = SearchEngine(country_id)
         self.search_request_id = search_request_id
         self.search_keywords = search_keywords
         self.collection_number = collection_number
-        self.filter_words = filter_words
-        self.inclusion_words = inclusion_words
-        self.email_collection = email_collection
-        self.phone_collection = phone_collection
-        self.url_collection = url_collection
-        self.facebook_collection = facebook_collection
-        self.company_name_collection = company_name_collection
-        self.company_profile_collection = company_profile_collection
+        self.filter_words = filter_words or None
+        self.inclusion_words = inclusion_words or None
+        self.email_collection = email_collection or False
+        self.phone_collection = phone_collection or False
+        self.url_collection = url_collection or False
+        self.facebook_collection = facebook_collection or False
+        self.company_name_collection = company_name_collection or False
+        self.company_profile_collection = company_profile_collection or False
 
     @property
     def page_urls(self):

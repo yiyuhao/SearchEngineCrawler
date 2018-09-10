@@ -59,10 +59,11 @@ class SearchRequestDBManager:
             result = cursor.fetchall()
 
             # mark data fetched
-            mark_fetched_sql, ids = self.get_mark_fetched_request_sql(result)
-            # todo
-            # cursor.execute(mark_fetched_sql, ids)
-            # cursor.commit()
+            if result:
+                mark_fetched_sql, ids = self.get_mark_fetched_request_sql(result)
+                # todo
+                # cursor.execute(mark_fetched_sql, ids)
+                # cursor.commit()
 
             return result
 

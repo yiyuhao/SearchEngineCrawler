@@ -35,7 +35,7 @@ REDIS_ENCODING = 'utf-8'
 MYSQL_HOST = 'localhost'
 MYSQL_DATABASE = 'ses'
 MYSQL_USER = 'root'
-MYSQL_PASSWORD = '$4qweqwe'
+MYSQL_PASSWORD = '123456'
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html

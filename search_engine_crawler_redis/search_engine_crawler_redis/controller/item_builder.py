@@ -52,7 +52,7 @@ class ItemBuilder:
 
     def response_contain_words(self, words):
         pattern = re.compile(words)
-        return pattern.findall(self.page_text)
+        return pattern.search(self.response.text)
 
     @property
     def need_search(self):

@@ -5,7 +5,7 @@ from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, L
 from scrapy.linkextractor import LinkExtractor
 
 from .search_engine import SearchEngine
-from utils import match_email, strip_tags, search_contact_us
+from utils import search_email, strip_tags, search_contact_us
 
 
 class Rule:
@@ -39,7 +39,7 @@ class Rule:
                     meta['phone_number'].add(phone_number)
 
                 # match email
-                for email in match_email(page_text):
+                for email in search_email(page_text):
                     print(f'find email: {email}')
                     meta['email'].add(email)
 

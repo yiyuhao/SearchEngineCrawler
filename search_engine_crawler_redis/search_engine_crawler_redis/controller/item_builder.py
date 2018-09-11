@@ -12,7 +12,7 @@ from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, L
 from scrapy.contrib.loader import ItemLoader
 
 from items import SearchResultItem
-from utils import match_email, strip_tags
+from utils import search_email, search_title, search_facebook, strip_tags
 
 
 class ItemBuilder:
@@ -37,6 +37,7 @@ class ItemBuilder:
         self.company_profile_collection = self.response.meta['company_profile_collection']
 
         self.domain_url = urlparse(response.url).netloc
+        self.title = search_title(self.response.text)
 
     def build_items(self):
         """@property will cause unexpected error"""
@@ -72,6 +73,7 @@ class ItemBuilder:
         item_loader = ItemLoader(item=SearchResultItem(), response=self.response)
         item_loader.add_value('search_request_id', self.search_request_id)
         item_loader.add_value('domain_name', self.domain_url)
+        item_loader.add_value('website_title', self.title)
         item_loader.add_value(field_name, value)
         item = item_loader.load_item()
 
@@ -83,7 +85,7 @@ class ItemBuilder:
         if not self.email_collection:
             return
 
-        for email in match_email(self.page_text):
+        for email in search_email(self.page_text):
             email = email.group()
             self.produce_item('mailbox', email)
 
@@ -105,6 +107,9 @@ class ItemBuilder:
     def build_facebook_items(self):
         if not self.facebook_collection:
             return
+
+        for facebook_url in search_facebook(self.response.text):
+            self.produce_item('facebook', facebook_url)
 
     def build_skype_items(self):
         return

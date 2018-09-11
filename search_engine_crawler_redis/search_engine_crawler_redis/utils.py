@@ -16,7 +16,9 @@ cleaner.style = True
 
 pattern_a_tag = re.compile(r'(<a.*?</a>)', re.IGNORECASE)
 pattern_contact_up = re.compile(r'contact|联系', re.IGNORECASE)
+pattern_facebook = re.compile(r'href=.*facebook\.com', re.IGNORECASE)
 pattern_href = re.compile(r'<a.*?href=[\'"](.*?)[\'"].*</a>', re.IGNORECASE)
+pattern_title = re.compile(r'<title>(.*?)</title>', re.IGNORECASE)
 
 # the result of search engine that needed filter
 pattern_ignore = re.compile(r'baidu|wiki|baike')
@@ -45,7 +47,13 @@ def strip_tags(html_text):
     return s.get_data()
 
 
-def match_email(text):
+def search_title(text):
+    match = pattern_title.search(text)
+    title = match.group(1) if match else 'No title'
+    return title
+
+
+def search_email(text):
     pattern = re.compile(email_regex)
     return pattern.finditer(text)
 
@@ -67,6 +75,23 @@ def search_contact_us(text) -> set:
                 contact_a_tags.add(match_href.group(1))
 
     return contact_a_tags
+
+
+def search_facebook(text) -> set:
+    text = re.sub('\s', '', text)
+
+    # find all <a></a>
+    a_tags = pattern_a_tag.findall(text)
+
+    facebook_a_tags = set()
+
+    for a_tag in a_tags:
+        if pattern_facebook.search(a_tag):
+            match_href = pattern_href.match(a_tag)
+            if match_href:
+                facebook_a_tags.add(match_href.group(1))
+
+    return facebook_a_tags
 
 
 def need_ignoring(url):

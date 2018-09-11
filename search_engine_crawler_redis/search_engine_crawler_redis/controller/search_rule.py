@@ -18,12 +18,12 @@ class Rule:
         self.collection_number = collection_number
         self.filter_words = filter_words or None
         self.inclusion_words = inclusion_words or None
-        self.email_collection = email_collection or False
-        self.phone_collection = phone_collection or False
-        self.url_collection = url_collection or False
-        self.facebook_collection = facebook_collection or False
-        self.company_name_collection = company_name_collection or False
-        self.company_profile_collection = company_profile_collection or False
+        self.email_collection = True if email_collection else False
+        self.phone_collection = True if phone_collection else False
+        self.url_collection = True if url_collection else False
+        self.facebook_collection = True if facebook_collection else False
+        self.company_name_collection = True if company_name_collection else False
+        self.company_profile_collection = True if company_profile_collection else False
 
     @property
     def page_urls(self):

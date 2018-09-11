@@ -31,7 +31,7 @@ class NationalConfigurationDBManager:
 
 class SearchRequestDBManager:
     query_sql = '''
-        SELECT b.id AS country_id, a.id, a.key_word, a.collection_number,
+        SELECT b.national_configuration_id AS country_id, a.id, a.key_word, a.collection_number,
             a.filter_words,a.inclusion_words, a.email_collection,a.phone_collection, a.url_collection,
             a.facebook_collection, a.company_name_collection, a.company_profile_collection
         FROM search_request a INNER JOIN search_country_relationship b
@@ -44,12 +44,12 @@ class SearchRequestDBManager:
 
     @staticmethod
     def get_mark_fetched_request_sql(query_result):
-        ids = list(set([id_ for id_ in query_result[1]]))
+        ids = list(set([item[1] for item in query_result]))
         format_strings = ','.join(['%s'] * len(ids))
         sql = f'''
             UPDATE search_request
             SET del_flag = 1
-            WHERE key_word IN ({format_strings});
+            WHERE id IN ({format_strings});
         '''
         return sql, ids
 
@@ -61,9 +61,7 @@ class SearchRequestDBManager:
             # mark data fetched
             if result:
                 mark_fetched_sql, ids = self.get_mark_fetched_request_sql(result)
-                # todo
-                # cursor.execute(mark_fetched_sql, ids)
-                # cursor.commit()
+                cursor.execute(mark_fetched_sql, ids)
 
             return result
 

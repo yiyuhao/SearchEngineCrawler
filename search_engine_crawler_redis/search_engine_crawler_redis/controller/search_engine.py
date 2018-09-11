@@ -52,14 +52,17 @@ class SearchEngine:
         if country_id not in search_engine_config:
             raise ValueError(f'no search engine found by country_id: {country_id}')
 
-        self.engine = search_engine_config[country_id]
+        engine = search_engine_config[country_id]
 
-        self.search_url = self.engine['search_url']
-        self.result_selector = self.engine['result_selector']
-        self.page_size = self.engine['page_size']
-        self.page_param = self.engine['page_param']
+        self.search_url = engine['search_url']
+        self.result_selector = engine['result_selector']
+        self.page_size = engine['page_size']
+        self.page_param = engine['page_param']
 
         self.base_url = urlparse(self.search_url).netloc
+
+    def __str__(self):
+        return self.base_url
 
     def page_urls(self, search_num: int, search_keywords: str):
         """

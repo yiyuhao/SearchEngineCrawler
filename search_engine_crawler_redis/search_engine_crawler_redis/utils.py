@@ -132,6 +132,9 @@ class SearchResultDupefilter:
         # clear expired item
         self.server.zremrangebyscore(self.key, 0, now)
 
-        added = self.server.zadd(self.key, expired_time, json.dumps(dict(item)))
+        item = dict(item)
+        del item['website_title']
+
+        added = self.server.zadd(self.key, expired_time, json.dumps(item))
 
         return added == 0

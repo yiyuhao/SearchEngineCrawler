@@ -29,8 +29,8 @@ class SearchResultItem(scrapy.Item):
         insert_sql = '''
             insert into search_details(search_request_id, domain_name, mailbox, 
             phone, website_title, website_ntroduction, 
-            facebook, skype) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            facebook, skype, create_date,update_date)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s ,now(),now())
         '''
         params = (
             self['search_request_id'], self.get('domain_name', None), self.get('mailbox', None),

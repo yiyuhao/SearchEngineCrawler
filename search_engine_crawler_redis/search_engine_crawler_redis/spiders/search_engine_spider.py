@@ -4,6 +4,7 @@ import scrapy
 from scrapy.linkextractor import LinkExtractor
 from scrapy_redis.spiders import RedisSpider
 
+from controller.config import RequestPriorityConfig
 from controller.take_scheduler import Scheduler
 from controller.item_builder import ItemBuilder
 from utils import search_contact_us, need_ignoring
@@ -50,14 +51,17 @@ class SearchEngineSpider(RedisSpider):
             self.logger.debug("Read %s requests", request_num)
 
     def parse_search_engine_result_page(self, response):
-        """parse search engine result"""
+        """parse search engine result, yield website homepage"""
 
         links = self._find_search_engine_result_links(response)
 
         for link in links:
             if not need_ignoring(link.url):
                 print(f'yield a search engine link: {link.url}')
-                yield scrapy.Request(url=link.url, callback=self.craw_website, meta=response.meta)
+                yield scrapy.Request(url=link.url,
+                                     callback=self.craw_website,
+                                     meta=response.meta,
+                                     priority=RequestPriorityConfig.website_homepage)
 
     def craw_website(self, response):
 
@@ -74,7 +78,10 @@ class SearchEngineSpider(RedisSpider):
                 if contact_page_urls:
                     for url in contact_page_urls:
                         print(f'find contact-us page, yield a site link: {url}')
-                        yield response.follow(url=url, callback=self.craw_website, meta=response.meta)
+                        yield response.follow(url=url,
+                                              callback=self.craw_website,
+                                              meta=response.meta,
+                                              priority=RequestPriorityConfig.website_contact)
 
                 # else find result, then search all pages
                 else:
@@ -85,9 +92,17 @@ class SearchEngineSpider(RedisSpider):
                     # follow url
                     links = self._find_all_links(response)
 
-                    for link in links:
-                        print(f'yield a site link: {link.url}')
-                        yield scrapy.Request(url=link.url, callback=self.craw_website, meta=response.meta)
+                    # filter online retailers website
+                    if len(links) < 50:
+                        for link in links:
+                            print(f'yield a site link: {link.url}')
+                            yield scrapy.Request(url=link.url,
+                                                 callback=self.craw_website,
+                                                 meta=response.meta,
+                                                 priority=RequestPriorityConfig.website_next_page_url)
+                    else:
+                        print('too many links: ', len(links), response.url)
+
             else:
                 for search_result_item in item_builder.build_items():
                     yield search_result_item

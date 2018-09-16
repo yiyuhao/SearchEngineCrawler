@@ -1,6 +1,7 @@
 import scrapy
 
-from .search_engine import SearchEngine
+from controller.search_engine import SearchEngine
+from controller.config import RequestPriorityConfig
 
 
 class Rule:
@@ -48,7 +49,9 @@ class Rule:
                     facebook_collection=self.facebook_collection,
                     company_name_collection=self.company_name_collection,
                     company_profile_collection=self.company_profile_collection,
-                ))
+                ),
+                priority=RequestPriorityConfig.search_engine_pages,
+            )
             for url in self.page_urls
         )
 

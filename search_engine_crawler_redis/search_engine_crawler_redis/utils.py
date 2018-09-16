@@ -17,7 +17,7 @@ cleaner.style = True
 pattern_a_tag = re.compile(r'(<a.*?</a>)', re.IGNORECASE)
 pattern_contact_up = re.compile(r'contact|联系|about|关于', re.IGNORECASE)
 pattern_facebook = re.compile(r'href=.*facebook\.com', re.IGNORECASE)
-pattern_skype = re.compile(r'href=.*skype\.com', re.IGNORECASE)
+pattern_skype = re.compile(r'href=.*(skype|callto):', re.IGNORECASE)
 pattern_href = re.compile(r'<a.*?href=[\'"](.*?)[\'"].*</a>', re.IGNORECASE)
 pattern_title = re.compile(r'<title>(.*?)</title>', re.IGNORECASE)
 pattern_description = re.compile(r'<meta.*?name=[\'"]description[\'"].*?content=[\'"](.*?)[\'"].*?>', re.IGNORECASE)

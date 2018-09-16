@@ -1,3 +1,5 @@
+
+import logging
 from urllib.parse import urlparse
 
 import scrapy
@@ -8,6 +10,8 @@ from controller.config import RequestPriorityConfig
 from controller.take_scheduler import Scheduler
 from controller.item_builder import ItemBuilder
 from utils import search_contact_us, need_ignoring
+
+logger = logging.getLogger(__name__)
 
 
 class SearchEngineSpider(RedisSpider):
@@ -43,12 +47,12 @@ class SearchEngineSpider(RedisSpider):
                 break
 
             for request in scrapy_requests:
-                print(f'send a crawl request.. {request.url}')
+                logger.info(f'yield a search engine page ({request.url})')
                 yield request
                 request_num += 1
 
         if request_num:
-            self.logger.debug("Read %s requests", request_num)
+            logger.info("read %s requests", request_num)
 
     def parse_search_engine_result_page(self, response):
         """parse search engine result, yield website homepage"""
@@ -57,11 +61,13 @@ class SearchEngineSpider(RedisSpider):
 
         for link in links:
             if not need_ignoring(link.url):
-                print(f'yield a search engine link: {link.url}')
+                logger.info(f'yield a website homepage request ({link.url}) from ({response.url})')
                 yield scrapy.Request(url=link.url,
                                      callback=self.craw_website,
                                      meta=response.meta,
                                      priority=RequestPriorityConfig.website_homepage)
+            else:
+                logger.info(f'skip a url because it contains baidu|wiki|baike|alibaba|amazon: ({link.url})')
 
     def craw_website(self, response):
 
@@ -77,7 +83,7 @@ class SearchEngineSpider(RedisSpider):
                 # if contact-us page existed, only search contact-us page
                 if contact_page_urls:
                     for url in contact_page_urls:
-                        print(f'find contact-us page, yield a site link: {url}')
+                        logger.info(f'yield a contact-us page ({url}) from ({response.url})')
                         yield response.follow(url=url,
                                               callback=self.craw_website,
                                               meta=response.meta,
@@ -95,13 +101,14 @@ class SearchEngineSpider(RedisSpider):
                     # filter online retailers website
                     if len(links) < 50:
                         for link in links:
-                            print(f'yield a site link: {link.url}')
+                            logger.info(f'yield a next-level page ({link.url}) from ({response.url})')
                             yield scrapy.Request(url=link.url,
                                                  callback=self.craw_website,
                                                  meta=response.meta,
                                                  priority=RequestPriorityConfig.website_next_page_url)
                     else:
-                        print('too many links: ', len(links), response.url)
+                        logger.warning(f'the website will be skip '
+                                       f'because of too many({len(links)}) urls found in its homepage: {response.url}')
 
             else:
                 for search_result_item in item_builder.build_items():

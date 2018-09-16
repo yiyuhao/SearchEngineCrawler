@@ -5,6 +5,7 @@
 #
 #   Copyright (c) 2018 麦禾互动. All rights reserved.
 
+import logging
 import re
 from urllib.parse import urlparse
 
@@ -13,6 +14,9 @@ from scrapy.contrib.loader import ItemLoader
 
 from items import SearchResultItem
 from utils import search_email, search_title, search_facebook, search_skype, strip_tags
+
+
+logger = logging.getLogger(__name__)
 
 
 class ItemBuilder:
@@ -78,11 +82,10 @@ class ItemBuilder:
         item_loader.add_value(field_name, value)
         item = item_loader.load_item()
 
-        print(f'build item: {item}')
+        logger.info(f'build a item: ({item})')
         self.items_set.add(item)
 
     def build_email_items(self):
-
         if not self.email_collection:
             return
 
@@ -93,6 +96,7 @@ class ItemBuilder:
     def build_phone_items(self):
         if not self.phone_collection:
             return
+
         for match in PhoneNumberMatcher(self.page_text, region='US', leniency=Leniency.POSSIBLE):
             phone_number = format_number(match.number, PhoneNumberFormat.INTERNATIONAL)
             self.produce_item('phone', phone_number)

@@ -67,6 +67,3 @@ class MysqlTwistedPipeline(object):
     def handle_error(self, failure, item, spider):
         """处理异步插入的异常"""
         print(failure)
-
-# todo redis pipeline
-# search_request_collection_number: {request_id: number}

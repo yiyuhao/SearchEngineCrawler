@@ -64,8 +64,3 @@ class SearchRequestDBManager:
                 cursor.execute(mark_fetched_sql, ids)
 
             return result
-
-
-if __name__ == '__main__':
-    manager = NationalConfigurationDBManager()
-    print(manager.fetch())

@@ -9,11 +9,6 @@ class Scheduler:
         self.db_manager = SearchRequestDBManager()
 
     def fetch_requests(self):
-        # 轴承：Bearing
-        # 办公家具：office furniture
-        # Led
-        # 机械配件：Machinery Parts
-        # 手机配件：Mobile phone accessories
         scrapy_requests = []
         db_query_result = self.db_manager.fetch_all()
         for search_request in db_query_result:

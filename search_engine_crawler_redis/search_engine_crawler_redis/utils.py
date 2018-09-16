@@ -20,6 +20,7 @@ pattern_facebook = re.compile(r'href=.*facebook\.com', re.IGNORECASE)
 pattern_skype = re.compile(r'href=.*skype\.com', re.IGNORECASE)
 pattern_href = re.compile(r'<a.*?href=[\'"](.*?)[\'"].*</a>', re.IGNORECASE)
 pattern_title = re.compile(r'<title>(.*?)</title>', re.IGNORECASE)
+pattern_description = re.compile(r'<meta.*?name=[\'"]description[\'"].*?content=[\'"](.*?)[\'"].*?>', re.IGNORECASE)
 
 # the result of search engine that needed filter
 pattern_ignore = re.compile(r'baidu|wiki|baike|alibaba|amazon')
@@ -52,6 +53,12 @@ def search_title(text):
     match = pattern_title.search(text)
     title = match.group(1) if match else 'No title'
     return title
+
+
+def search_description(text):
+    match = pattern_description.search(text)
+    description = match.group(1) if match else 'No title'
+    return description
 
 
 def search_email(text):

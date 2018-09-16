@@ -13,7 +13,7 @@ from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, L
 from scrapy.contrib.loader import ItemLoader
 
 from items import SearchResultItem
-from utils import search_email, search_title, search_facebook, search_skype, strip_tags
+from utils import search_email, search_title, search_description, search_facebook, search_skype, strip_tags
 
 
 logger = logging.getLogger(__name__)
@@ -43,6 +43,7 @@ class ItemBuilder:
 
         self.domain_url = urlparse(response.url).netloc
         self.title = search_title(self.response.text)
+        self.description = search_description(self.response.text)
 
     def build_items(self):
         """@property will cause unexpected error"""
@@ -79,6 +80,7 @@ class ItemBuilder:
         item_loader.add_value('search_request_id', self.search_request_id)
         item_loader.add_value('domain_name', self.domain_url)
         item_loader.add_value('website_title', self.title)
+        item_loader.add_value('website_ntroduction', self.description)
         item_loader.add_value(field_name, value)
         item = item_loader.load_item()
 

@@ -17,6 +17,7 @@ cleaner.style = True
 pattern_a_tag = re.compile(r'(<a.*?</a>)', re.IGNORECASE)
 pattern_contact_up = re.compile(r'contact|联系|about|关于', re.IGNORECASE)
 pattern_facebook = re.compile(r'href=.*facebook\.com', re.IGNORECASE)
+pattern_skype = re.compile(r'href=.*skype\.com', re.IGNORECASE)
 pattern_href = re.compile(r'<a.*?href=[\'"](.*?)[\'"].*</a>', re.IGNORECASE)
 pattern_title = re.compile(r'<title>(.*?)</title>', re.IGNORECASE)
 
@@ -92,6 +93,23 @@ def search_facebook(text) -> set:
                 facebook_a_tags.add(match_href.group(1))
 
     return facebook_a_tags
+
+
+def search_skype(text) -> set:
+    text = re.sub('\s', '', text)
+
+    # find all <a></a>
+    a_tags = pattern_a_tag.findall(text)
+
+    skype_a_tags = set()
+
+    for a_tag in a_tags:
+        if pattern_skype.search(a_tag):
+            match_href = pattern_href.match(a_tag)
+            if match_href:
+                skype_a_tags.add(match_href.group(1))
+
+    return skype_a_tags
 
 
 def need_ignoring(url):

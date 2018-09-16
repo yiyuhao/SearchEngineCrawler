@@ -12,7 +12,7 @@ from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, L
 from scrapy.contrib.loader import ItemLoader
 
 from items import SearchResultItem
-from utils import search_email, search_title, search_facebook, strip_tags
+from utils import search_email, search_title, search_facebook, search_skype, strip_tags
 
 
 class ItemBuilder:
@@ -33,6 +33,7 @@ class ItemBuilder:
         self.phone_collection = self.response.meta['phone_collection']
         self.url_collection = self.response.meta['url_collection']
         self.facebook_collection = self.response.meta['facebook_collection']
+        self.skype_collection = self.response.meta['skype_collection']
         self.company_name_collection = self.response.meta['company_name_collection']
         self.company_profile_collection = self.response.meta['company_profile_collection']
 
@@ -112,4 +113,8 @@ class ItemBuilder:
             self.produce_item('facebook', facebook_url)
 
     def build_skype_items(self):
-        return
+        if not self.skype_collection:
+            return
+
+        for skype_url in search_skype(self.response.text):
+            self.produce_item('skype', skype_url)

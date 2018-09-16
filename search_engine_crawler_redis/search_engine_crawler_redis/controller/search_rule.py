@@ -23,6 +23,7 @@ class Rule:
         self.phone_collection = True if phone_collection else False
         self.url_collection = True if url_collection else False
         self.facebook_collection = True if facebook_collection else False
+        self.skype_collection = True
         self.company_name_collection = True if company_name_collection else False
         self.company_profile_collection = True if company_profile_collection else False
 
@@ -47,6 +48,7 @@ class Rule:
                     phone_collection=self.phone_collection,
                     url_collection=self.url_collection,
                     facebook_collection=self.facebook_collection,
+                    skype_collection=self.skype_collection,
                     company_name_collection=self.company_name_collection,
                     company_profile_collection=self.company_profile_collection,
                 ),

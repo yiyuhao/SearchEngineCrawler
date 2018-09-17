@@ -41,7 +41,7 @@ class ItemBuilder:
         self.company_name_collection = self.response.meta['company_name_collection']
         self.company_profile_collection = self.response.meta['company_profile_collection']
 
-        self.domain_url = urlparse(response.url).netloc
+        self.domain_url = response.url
         self.title = search_title(self.response.text)
         self.description = search_description(self.response.text)
 

@@ -23,6 +23,7 @@ class NationalConfigurationDBManager:
         self.conn = conn
 
     def fetch(self):
+        conn.ping()
         with conn.cursor() as cursor:
             cursor.execute(self.query_sql)
             result = cursor.fetchall()
@@ -54,6 +55,7 @@ class SearchRequestDBManager:
         return sql, ids
 
     def fetch_all(self):
+        conn.ping()
         with conn.cursor() as cursor:
             cursor.execute(self.query_sql)
             result = cursor.fetchall()

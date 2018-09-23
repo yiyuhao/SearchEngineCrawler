@@ -49,8 +49,12 @@ ITEM_PIPELINES = {
 ROBOTSTXT_OBEY = False
 
 # TTL of request fingerprint (url dupefilter) in redis sorted set.
+# url fingerprint 去重TTL
 FINGERPRINT_TTL = 30 * 60
+# item 去重TTL
 SEARCH_RESULT_ITEM_TTL = 30 * 60
+# 已停止search_request_id去重TTL
+STOPPED_SEARCH_REQUEST_TTL = 60 * 60
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -83,9 +87,9 @@ COOKIES_ENABLED = False
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#    'search_engine_crawler_redis.middlewares.SearchEngineCrawlerRedisDownloaderMiddleware': 543,
-# }
+DOWNLOADER_MIDDLEWARES = {
+   'search_engine_crawler_redis.middlewares.SearchEngineCrawlerRedisDownloaderMiddleware': 543,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html

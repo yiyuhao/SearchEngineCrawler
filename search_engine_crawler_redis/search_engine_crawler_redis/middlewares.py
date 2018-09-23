@@ -4,8 +4,12 @@
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-
+import logging
 from scrapy import signals
+from scrapy.exceptions import IgnoreRequest
+from utils import has_stopped
+
+logger = logging.getLogger(__name__)
 
 
 class SearchEngineCrawlerRedisSpiderMiddleware(object):
@@ -78,6 +82,9 @@ class SearchEngineCrawlerRedisDownloaderMiddleware(object):
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+        if has_stopped(request):
+            logger.debug(f'ignore a request(stopped, id={request.meta["search_request_id"]})')
+            raise IgnoreRequest
         return None
 
     def process_response(self, request, response, spider):

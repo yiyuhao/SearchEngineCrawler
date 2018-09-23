@@ -4,11 +4,11 @@ import time
 from html.parser import HTMLParser
 
 from lxml.html.clean import Cleaner
-from scrapy_redis.connection import get_redis_from_settings
 from scrapy.crawler import Settings
 
-from controller.db_manager import NationalConfigurationDBManager
-from settings import email_regex, SEARCH_RESULT_ITEM_TTL
+from controller.db_manager import NationalConfigurationDBManager, SearchRequestDBManager
+from scrapy_redis.connection import get_redis_from_settings
+from settings import email_regex, SEARCH_RESULT_ITEM_TTL, STOPPED_SEARCH_REQUEST_TTL
 
 cleaner = Cleaner()
 cleaner.javascript = True
@@ -39,6 +39,29 @@ class HTMLStripper(HTMLParser):
 
     def get_data(self):
         return '*'.join(self.fed)
+
+
+class SearchResultDupefilter:
+
+    def __init__(self):
+        self.server = get_redis_from_settings(Settings())
+        self.key = f'search_result_item_dupefilter'
+
+    def seen(self, item):
+        """check if item already existed"""
+
+        now = time.time()
+        expired_time = now + SEARCH_RESULT_ITEM_TTL
+
+        # clear expired item
+        self.server.zremrangebyscore(self.key, 0, now)
+
+        item = dict(item)
+        del item['website_title']
+
+        added = self.server.zadd(self.key, expired_time, json.dumps(item))
+
+        return added == 0
 
 
 def strip_tags(html_text):
@@ -142,24 +165,24 @@ def get_search_engine_config():
     return config
 
 
-class SearchResultDupefilter:
+def has_stopped(request):
+    search_request_id = json.dumps(request.meta['search_request_id'])
 
-    def __init__(self):
-        self.server = get_redis_from_settings(Settings())
-        self.key = f'search_result_item_dupefilter'
+    # check redis if request has been stopped
+    server = get_redis_from_settings(Settings())
+    key = f'search_request_stopped_id_zset'
+    now = time.time()
+    expired_time = now + STOPPED_SEARCH_REQUEST_TTL
+    server.zremrangebyscore(key, 0, now)  # clear expired request and add
+    added = server.zadd(key, expired_time, search_request_id)
 
-    def seen(self, item):
-        """check if item already existed"""
+    if not added:  # already cached in redis
+        return True
 
-        now = time.time()
-        expired_time = now + SEARCH_RESULT_ITEM_TTL
-
-        # clear expired item
-        self.server.zremrangebyscore(self.key, 0, now)
-
-        item = dict(item)
-        del item['website_title']
-
-        added = self.server.zadd(self.key, expired_time, json.dumps(item))
-
-        return added == 0
+    # else search db, if not stopped then del id in zset
+    db = SearchRequestDBManager()
+    if not db.has_stopped(request.meta['search_request_id']):
+        server.zrem(key, search_request_id)
+        return False
+    else:
+        return True

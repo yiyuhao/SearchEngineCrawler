@@ -77,3 +77,14 @@ class SearchRequestDBManager:
                 cursor.execute(mark_fetched_sql, ids)
 
             return result
+
+    def has_stopped(self, search_request_id):
+        sql = '''
+            SELECT 1
+            FROM search_request
+            WHERE id='%s' AND DATE_ADD(update_date,INTERVAL 10 SECOND) < NOW();
+        '''
+
+        with self.conn.cursor() as cursor:
+            has_stopped = cursor.execute(sql, [search_request_id])
+            return True if has_stopped else False

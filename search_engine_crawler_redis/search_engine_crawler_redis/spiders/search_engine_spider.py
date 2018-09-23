@@ -4,11 +4,11 @@ from urllib.parse import urlparse
 
 import scrapy
 from scrapy.linkextractor import LinkExtractor
-from scrapy_redis.spiders import RedisSpider
 
 from controller.config import RequestPriorityConfig
-from controller.take_scheduler import Scheduler
 from controller.item_builder import ItemBuilder
+from controller.take_scheduler import Scheduler
+from scrapy_redis.spiders import RedisSpider
 from utils import search_contact_us, need_ignoring
 
 logger = logging.getLogger(__name__)

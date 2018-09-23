@@ -7,10 +7,10 @@
 
 
 class RequestPriorityConfig:
-    search_engine_pages = 1000
-    website_contact = 800
-    website_homepage = 600
-    website_next_page_url = 400
+    search_engine_pages = 1000  # 搜索引擎结果页
+    website_contact = 800  # 网站联系我们页面
+    website_homepage = 600  # 网站首页
+    website_next_page_url = 400  # 网站二级页面
 
 
 class Todo:

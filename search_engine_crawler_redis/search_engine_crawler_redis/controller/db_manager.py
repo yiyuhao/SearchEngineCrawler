@@ -10,7 +10,20 @@ import MySQLdb
 
 from settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 
-conn = MySQLdb.connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, charset='utf8')
+
+class DBConnection:
+
+    @classmethod
+    def get_connection(cls):
+        return MySQLdb.connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, charset='utf8')
+
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = cls.get_connection()
+        cls.instance.close()
+        if not cls.instance.open:
+            cls.instance = cls.get_connection()
+        return cls.instance
 
 
 class NationalConfigurationDBManager:
@@ -20,11 +33,10 @@ class NationalConfigurationDBManager:
     '''
 
     def __init__(self):
-        self.conn = conn
+        self.conn = DBConnection()
 
     def fetch(self):
-        conn.ping()
-        with conn.cursor() as cursor:
+        with self.conn.cursor() as cursor:
             cursor.execute(self.query_sql)
             result = cursor.fetchall()
             return result
@@ -41,7 +53,7 @@ class SearchRequestDBManager:
     '''
 
     def __init__(self):
-        self.conn = conn
+        self.conn = DBConnection()
 
     @staticmethod
     def get_mark_fetched_request_sql(query_result):
@@ -55,8 +67,7 @@ class SearchRequestDBManager:
         return sql, ids
 
     def fetch_all(self):
-        conn.ping()
-        with conn.cursor() as cursor:
+        with self.conn.cursor() as cursor:
             cursor.execute(self.query_sql)
             result = cursor.fetchall()
 

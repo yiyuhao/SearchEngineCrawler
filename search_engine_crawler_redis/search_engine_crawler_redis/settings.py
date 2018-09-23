@@ -49,8 +49,8 @@ ITEM_PIPELINES = {
 ROBOTSTXT_OBEY = False
 
 # TTL of request fingerprint (url dupefilter) in redis sorted set.
-FINGERPRINT_TTL = 3 * 60
-SEARCH_RESULT_ITEM_TTL = 10 * 60
+FINGERPRINT_TTL = 30 * 60
+SEARCH_RESULT_ITEM_TTL = 30 * 60
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32

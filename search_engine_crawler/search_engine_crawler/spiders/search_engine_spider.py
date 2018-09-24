@@ -1,6 +1,6 @@
 import scrapy
 
-from controller.take_scheduler import Scheduler
+from controller.task_scheduler import Scheduler
 
 scheduler = Scheduler()
 

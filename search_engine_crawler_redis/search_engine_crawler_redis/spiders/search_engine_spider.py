@@ -6,7 +6,7 @@ from scrapy.linkextractor import LinkExtractor
 
 from controller.config import request_priority_config
 from controller.item_builder import ItemBuilder
-from controller.take_scheduler import Scheduler
+from controller.task_scheduler import Scheduler
 from scrapy_redis.spiders import RedisSpider
 from utils import search_contact_us, need_ignoring
 

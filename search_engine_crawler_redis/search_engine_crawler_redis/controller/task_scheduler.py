@@ -23,4 +23,4 @@ class Scheduler:
 
             random.shuffle(self.scrapy_requests)
 
-        return self.scrapy_requests.pop()
+        return self.scrapy_requests.pop() if self.scrapy_requests else None

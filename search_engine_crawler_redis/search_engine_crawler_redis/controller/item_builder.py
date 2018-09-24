@@ -7,14 +7,12 @@
 
 import logging
 import re
-from urllib.parse import urlparse
 
 from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, Leniency
 from scrapy.contrib.loader import ItemLoader
 
 from items import SearchResultItem
 from utils import search_email, search_title, search_description, search_facebook, search_skype, strip_tags
-
 
 logger = logging.getLogger(__name__)
 

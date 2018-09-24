@@ -1,7 +1,7 @@
 import scrapy
 
+from controller.config import request_priority_config
 from controller.search_engine import SearchEngine
-from controller.config import RequestPriorityConfig
 
 
 class Rule:
@@ -11,7 +11,6 @@ class Rule:
                  filter_words, inclusion_words,
                  email_collection, phone_collection, url_collection,
                  facebook_collection, company_name_collection, company_profile_collection):
-
         self.spider = spider
         self.engine = SearchEngine(country_id)
         self.search_request_id = search_request_id
@@ -52,7 +51,7 @@ class Rule:
                     company_name_collection=self.company_name_collection,
                     company_profile_collection=self.company_profile_collection,
                 ),
-                priority=RequestPriorityConfig.search_engine_pages,
+                priority=request_priority_config.search_engine_pages,
                 dont_filter=True,
             )
             for url in self.page_urls

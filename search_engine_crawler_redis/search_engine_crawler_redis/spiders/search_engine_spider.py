@@ -1,11 +1,10 @@
-
 import logging
 from urllib.parse import urlparse
 
 import scrapy
 from scrapy.linkextractor import LinkExtractor
 
-from controller.config import RequestPriorityConfig
+from controller.config import request_priority_config
 from controller.item_builder import ItemBuilder
 from controller.take_scheduler import Scheduler
 from scrapy_redis.spiders import RedisSpider
@@ -41,15 +40,14 @@ class SearchEngineSpider(RedisSpider):
 
         request_num = 0
         while request_num < self.redis_batch_size:
-            scrapy_requests = self.task_scheduler.fetch_requests()
+            scrapy_request = self.task_scheduler.fetch_one_request()
 
-            if not scrapy_requests:
+            if not scrapy_request:
                 break
 
-            for request in scrapy_requests:
-                logger.info(f'yield a search engine page ({request.url})')
-                yield request
-                request_num += 1
+            logger.info(f'yield a search engine page ({scrapy_request.url})')
+            yield scrapy_request
+            request_num += 1
 
         if request_num:
             logger.info("read %s requests", request_num)
@@ -65,7 +63,7 @@ class SearchEngineSpider(RedisSpider):
                 yield scrapy.Request(url=link.url,
                                      callback=self.craw_website,
                                      meta=response.meta,
-                                     priority=RequestPriorityConfig.website_homepage)
+                                     priority=request_priority_config.website_homepage)
             else:
                 logger.info(f'skip a url because it contains baidu|wiki|baike|alibaba|amazon: ({link.url})')
 
@@ -87,7 +85,7 @@ class SearchEngineSpider(RedisSpider):
                         yield response.follow(url=url,
                                               callback=self.craw_website,
                                               meta=response.meta,
-                                              priority=RequestPriorityConfig.website_contact)
+                                              priority=request_priority_config.website_contact)
 
                 # else find result, then search all pages
                 else:
@@ -105,7 +103,7 @@ class SearchEngineSpider(RedisSpider):
                             yield scrapy.Request(url=link.url,
                                                  callback=self.craw_website,
                                                  meta=response.meta,
-                                                 priority=RequestPriorityConfig.website_next_page_url)
+                                                 priority=request_priority_config.website_next_page_url)
                     else:
                         logger.warning(f'the website will be skip '
                                        f'because of too many({len(links)}) urls found in its homepage: {response.url}')

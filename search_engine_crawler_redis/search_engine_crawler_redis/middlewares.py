@@ -4,9 +4,12 @@
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
+
 import logging
+
 from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
+
 from utils import has_stopped
 
 logger = logging.getLogger(__name__)

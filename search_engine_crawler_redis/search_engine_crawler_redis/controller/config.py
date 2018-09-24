@@ -4,24 +4,24 @@ from random import randint
 class RequestPriorityConfig:
 
     @property
-    def search_engine_pages(self):
-        """搜索引擎结果页"""
-        return randint(301, 400)
-
-    @property
     def website_contact(self):
         """网站联系我们页面"""
-        return randint(201, 300)
+        return randint(601, 900)
+
+    @property
+    def search_engine_pages(self):
+        """搜索引擎结果页"""
+        return randint(301, 600)
 
     @property
     def website_homepage(self):
         """网站首页"""
-        return randint(101, 200)
+        return randint(301, 600)
 
     @property
     def website_next_page_url(self):
         """网站二级页面"""
-        return randint(1, 100)
+        return randint(1, 300)
 
 
 request_priority_config = RequestPriorityConfig()

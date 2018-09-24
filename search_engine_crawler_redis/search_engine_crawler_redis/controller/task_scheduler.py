@@ -11,11 +11,10 @@ class Scheduler:
         self.scrapy_requests = []
 
     def fetch_one_request(self):
-        if not self.scrapy_requests:
+        db_manager = SearchRequestDBManager()
+        db_query_result = db_manager.fetch_all()
 
-            db_manager = SearchRequestDBManager()
-            db_query_result = db_manager.fetch_all()
-
+        if db_query_result:
             for search_request in db_query_result:
                 rule = Rule(self.spider, *search_request)
                 for req in rule.scrapy_requests:

@@ -1,11 +1,3 @@
-#
-#      File: db_manager.py
-#   Project: payunion
-#    Author: Yi Yuhao
-#
-#   Copyright (c) 2018 麦禾互动. All rights reserved.
-
-
 import MySQLdb
 
 from settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE

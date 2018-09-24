@@ -30,6 +30,7 @@ request_priority_config = RequestPriorityConfig()
 class Todo:
     todo = [
         '根据request id结束爬虫(redis中删除request)',
-        '突破反爬',
-        '重构zrem, zadd等系列逻辑'
+        '突破google反爬, fake_user_agent, proxy ip',
+        '重构zrem, zadd等系列逻辑',
+        '百度搜索结果地址包含在js中因此无法获取到网站首页url'
     ]

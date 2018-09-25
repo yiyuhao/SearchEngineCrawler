@@ -55,7 +55,9 @@ class SearchEngineSpider(RedisSpider):
     def parse_search_engine_result_page(self, response):
         """parse search engine result, yield website homepage"""
 
-        self.task_scheduler.update_request()
+        scrapy_request = self.task_scheduler.fetch_one_request()
+        if scrapy_request:
+            yield scrapy_request
 
         links = self._find_search_engine_result_links(response)
 
@@ -71,7 +73,9 @@ class SearchEngineSpider(RedisSpider):
 
     def craw_website(self, response):
 
-        self.task_scheduler.update_request()
+        scrapy_request = self.task_scheduler.fetch_one_request()
+        if scrapy_request:
+            yield scrapy_request
 
         item_builder = ItemBuilder(response)
 

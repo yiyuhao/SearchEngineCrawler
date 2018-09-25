@@ -90,9 +90,43 @@ class FifoQueue(Base):
 class PriorityQueue(Base):
     """Per-spider priority queue abstraction using redis' sorted set"""
 
+    def __init__(self, *args, **kwargs):
+        super(PriorityQueue, self).__init__(*args, **kwargs)
+        self.requests = {}
+        self.cur_request_id = None
+
     def __len__(self):
         """Return the length of the queue"""
         return self.server.zcard(self.key)
+
+    def _record_request_push(self, request_id):
+        self.requests[request_id] = self.requests.get(request_id, 0) + 1
+
+    def _record_request_pop(self, request_id):
+        after_num = self.requests[request_id] - 1
+        self.requests[request_id] = after_num
+
+        if after_num == 0:
+            del self.requests[request_id]
+
+    @property
+    def next_request_id(self):
+        if not self.requests:
+            return None
+
+        if self.cur_request_id is None:
+            result = next(iter(self.requests.keys()))  # first elem of self.requests
+        else:
+            found = False
+            for id_ in self.requests.keys():
+                if found is True:
+                    result = id_
+                    break
+                if self.cur_request_id == id_:
+                    found = True
+            else:
+                result = next(iter(self.requests.keys()))
+        return result
 
     def push(self, request):
         """Push a request"""
@@ -102,6 +136,8 @@ class PriorityQueue(Base):
         # whether the class is Redis or StrictRedis, and the option of using
         # kwargs only accepts strings, not bytes.
         self.server.execute_command('ZADD', self.key, score, data)
+        self._record_request_push(request.meta['search_request_id'])  # record then fetch one by one from different requests
+        print(f'push {request.meta["search_request_id"]}      now=========={self.requests}')
 
     def pop(self, timeout=0):
         """
@@ -109,11 +145,29 @@ class PriorityQueue(Base):
         timeout not support in this queue class
         """
         # use atomic range/remove using multi/exec
+        next_id = self.next_request_id
+
+        if next_id:
+            all_requests = self.server.zrange(self.key, 0, -1)
+            for redis_request in all_requests:
+                id_ = self.serializer.loads(redis_request)['meta']['search_request_id']
+                if id_ == next_id:
+                    print(f'pop ====={id_}===== list: {self.requests}, cur_id: {self.cur_request_id}')
+                    self.cur_request_id = id_
+                    self._record_request_pop(id_)
+                    self.server.zrem(self.key, redis_request)
+                    return self._decode_request(redis_request)
+
+        # not find
         pipe = self.server.pipeline()
         pipe.multi()
         pipe.zrange(self.key, 0, 0).zremrangebyrank(self.key, 0, 0)
         results, count = pipe.execute()
         if results:
+            id_ = self.serializer.loads(results[0])['meta']['search_request_id']
+            print(f'pop ====={id_}===== list: {self.requests}, cur_id: {self.cur_request_id}')
+            self.cur_request_id = id_
+            self._record_request_pop(id_)
             return self._decode_request(results[0])
 
 

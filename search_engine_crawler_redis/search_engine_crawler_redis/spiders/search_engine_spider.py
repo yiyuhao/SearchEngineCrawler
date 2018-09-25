@@ -39,7 +39,7 @@ class SearchEngineSpider(RedisSpider):
         """Returns a request to be scheduled or none."""
 
         request_num = 0
-        while request_num < self.redis_batch_size:
+        while True:
             scrapy_request = self.task_scheduler.fetch_one_request()
 
             if not scrapy_request:

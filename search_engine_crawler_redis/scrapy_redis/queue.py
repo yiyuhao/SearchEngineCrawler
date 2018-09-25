@@ -137,7 +137,6 @@ class PriorityQueue(Base):
         # kwargs only accepts strings, not bytes.
         self.server.execute_command('ZADD', self.key, score, data)
         self._record_request_push(request.meta['search_request_id'])  # record then fetch one by one from different requests
-        print(f'push {request.meta["search_request_id"]}      now=========={self.requests}')
 
     def pop(self, timeout=0):
         """
@@ -152,7 +151,7 @@ class PriorityQueue(Base):
             for redis_request in all_requests:
                 id_ = self.serializer.loads(redis_request)['meta']['search_request_id']
                 if id_ == next_id:
-                    print(f'pop ====={id_}===== list: {self.requests}, cur_id: {self.cur_request_id}')
+                    # print(f'pop ====={id_}===== list: {self.requests}, cur_id: {self.cur_request_id}')
                     self.cur_request_id = id_
                     self._record_request_pop(id_)
                     self.server.zrem(self.key, redis_request)
@@ -165,7 +164,7 @@ class PriorityQueue(Base):
         results, count = pipe.execute()
         if results:
             id_ = self.serializer.loads(results[0])['meta']['search_request_id']
-            print(f'pop ====={id_}===== list: {self.requests}, cur_id: {self.cur_request_id}')
+            # print(f'pop ====={id_}===== list: {self.requests}, cur_id: {self.cur_request_id}')
             self.cur_request_id = id_
             self._record_request_pop(id_)
             return self._decode_request(results[0])

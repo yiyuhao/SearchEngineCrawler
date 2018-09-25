@@ -103,10 +103,12 @@ class PriorityQueue(Base):
         self.requests[request_id] = self.requests.get(request_id, 0) + 1
 
     def _record_request_pop(self, request_id):
+        if request_id not in self.requests:
+            return
         after_num = self.requests[request_id] - 1
         self.requests[request_id] = after_num
 
-        if after_num == 0:
+        if after_num <= 0:
             del self.requests[request_id]
 
     @property

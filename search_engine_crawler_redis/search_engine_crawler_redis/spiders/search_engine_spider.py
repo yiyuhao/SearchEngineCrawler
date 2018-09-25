@@ -55,6 +55,8 @@ class SearchEngineSpider(RedisSpider):
     def parse_search_engine_result_page(self, response):
         """parse search engine result, yield website homepage"""
 
+        self.task_scheduler.update_request()
+
         links = self._find_search_engine_result_links(response)
 
         for link in links:
@@ -68,6 +70,8 @@ class SearchEngineSpider(RedisSpider):
                 logger.info(f'skip a url because it contains baidu|wiki|baike|alibaba|amazon: ({link.url})')
 
     def craw_website(self, response):
+
+        self.task_scheduler.update_request()
 
         item_builder = ItemBuilder(response)
 

@@ -92,6 +92,8 @@ DOWNLOADER_MIDDLEWARES = {
    'search_engine_crawler_redis.middlewares.SearchEngineCrawlerRedisDownloaderMiddleware': 543,
 }
 
+DOWNLOAD_TIMEOUT = 60
+
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
 # EXTENSIONS = {

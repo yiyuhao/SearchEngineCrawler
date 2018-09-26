@@ -28,7 +28,7 @@ request_priority_config = RequestPriorityConfig()
 
 
 class CrawConfig:
-    MAX_ITEM_PER_PAGE = 50
+    MAX_ITEM_PER_PAGE = 20
 
 
 class Todo:

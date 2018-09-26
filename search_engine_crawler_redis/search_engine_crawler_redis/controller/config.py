@@ -11,12 +11,12 @@ class RequestPriorityConfig:
     @property
     def search_engine_pages(self):
         """搜索引擎结果页"""
-        return randint(301, 600)
+        return randint(401, 600)
 
     @property
     def website_homepage(self):
         """网站首页"""
-        return randint(301, 600)
+        return randint(301, 501)
 
     @property
     def website_next_page_url(self):

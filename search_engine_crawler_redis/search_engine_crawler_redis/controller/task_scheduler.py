@@ -1,5 +1,4 @@
-import random
-
+import time
 from controller.db_manager import SearchRequestDBManager
 from controller.search_rule import Rule
 
@@ -10,6 +9,7 @@ class Scheduler:
         self.spider = spider
         self.scrapy_requests = {}
         self.cur_request_id = None
+        self.request_updated_time = time.time()
 
     @property
     def next_request_id(self):
@@ -55,7 +55,11 @@ class Scheduler:
 
         return request
 
-    def fetch_one_request(self):
+    def update_request(self):
+
+        if time.time() - self.request_updated_time < 1:
+            return
+
         db_manager = SearchRequestDBManager()
         db_query_result = db_manager.fetch_all()
 
@@ -65,4 +69,8 @@ class Scheduler:
                 for req in rule.scrapy_requests:
                     self._append_request(req)
 
+        self.request_updated_time = time.time()
+
+    def fetch_one_request(self):
+        self.update_request()
         return self._fetch_one()

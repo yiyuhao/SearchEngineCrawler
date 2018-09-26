@@ -4,6 +4,7 @@ import re
 from phonenumbers import PhoneNumberMatcher, PhoneNumberFormat, format_number, Leniency
 from scrapy.contrib.loader import ItemLoader
 
+from controller.config import CrawConfig
 from items import SearchResultItem
 from utils import search_email, search_title, search_description, search_facebook, search_skype, strip_tags
 
@@ -65,7 +66,13 @@ class ItemBuilder:
 
         return True
 
+    @property
+    def enough(self):
+        return len(self.items_set) > CrawConfig.MAX_ITEM_PER_PAGE
+
     def produce_item(self, field_name, value):
+        if self.enough:
+            return
 
         item_loader = ItemLoader(item=SearchResultItem(), response=self.response)
         item_loader.add_value('search_request_id', self.search_request_id)
@@ -79,7 +86,7 @@ class ItemBuilder:
         self.items_set.add(item)
 
     def build_email_items(self):
-        if not self.email_collection:
+        if not self.email_collection or self.enough:
             return
 
         for email in search_email(self.page_text):
@@ -87,7 +94,7 @@ class ItemBuilder:
             self.produce_item('mailbox', email)
 
     def build_phone_items(self):
-        if not self.phone_collection:
+        if not self.phone_collection or self.enough:
             return
 
         for match in PhoneNumberMatcher(self.page_text, region='US', leniency=Leniency.POSSIBLE):
@@ -95,22 +102,22 @@ class ItemBuilder:
             self.produce_item('phone', phone_number)
 
     def build_company_name_items(self):
-        if not self.company_name_collection:
+        if not self.company_name_collection or self.enough:
             return
 
     def build_company_profile_items(self):
-        if not self.company_profile_collection:
+        if not self.company_profile_collection or self.enough:
             return
 
     def build_facebook_items(self):
-        if not self.facebook_collection:
+        if not self.facebook_collection or self.enough:
             return
 
         for facebook_url in search_facebook(self.response.text):
             self.produce_item('facebook', facebook_url)
 
     def build_skype_items(self):
-        if not self.skype_collection:
+        if not self.skype_collection or self.enough:
             return
 
         for skype_url in search_skype(self.response.text):

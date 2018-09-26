@@ -27,6 +27,10 @@ class RequestPriorityConfig:
 request_priority_config = RequestPriorityConfig()
 
 
+class CrawConfig:
+    MAX_ITEM_PER_PAGE = 50
+
+
 class Todo:
     todo = [
         # '根据request id结束爬虫(redis中删除request)',

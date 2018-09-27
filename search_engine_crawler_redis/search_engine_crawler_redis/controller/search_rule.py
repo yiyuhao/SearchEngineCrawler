@@ -52,6 +52,7 @@ class Rule:
                     company_profile_collection=self.company_profile_collection,
                 ),
                 priority=request_priority_config.search_engine_pages,
+                dont_filter=True
             )
             for url in self.page_urls
         )

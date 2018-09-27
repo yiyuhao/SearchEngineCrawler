@@ -116,6 +116,8 @@ class RFPDupeFilter(BaseDupeFilter):
 
         # This returns the number of values added, zero if already exists.
         # added = self.server.sadd(self.key, fp)
+        if not added:
+            logger.debug(f'duplicate url: {request.url}')
         return added == 0
 
     def request_fingerprint(self, request):

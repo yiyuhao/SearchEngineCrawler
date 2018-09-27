@@ -11,8 +11,33 @@ from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
 
 from utils import has_stopped
+from fake_useragent import UserAgent
 
 logger = logging.getLogger(__name__)
+
+
+class RandomUserAgentDownloadMiddleware(object):
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        s = cls()
+        crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        s.user_agent = UserAgent
+        s.user_agent_type = crawler.settings.get('RANDOM_USER_AGENT_TYPE', 'random')
+        return s
+
+    def process_request(self, request, spider):
+        request.headers.setdefault('User-Agent', getattr(self.user_agent(), self.user_agent_type))
+        return None
+
+    def process_response(self, request, response, spider):
+        return response
+
+    def process_exception(self, request, exception, spider):
+        pass
+
+    def spider_opened(self, spider):
+        spider.logger.info('Spider opened: %s' % spider.name)
 
 
 class SearchEngineCrawlerRedisSpiderMiddleware(object):

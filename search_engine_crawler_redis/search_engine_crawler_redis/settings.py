@@ -89,7 +89,9 @@ COOKIES_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'search_engine_crawler_redis.middlewares.SearchEngineCrawlerRedisDownloaderMiddleware': 543,
+    'search_engine_crawler_redis.middlewares.SearchEngineCrawlerRedisDownloaderMiddleware': 100,
+    'search_engine_crawler_redis.middlewares.RandomUserAgentDownloadMiddleware': 200,
+
 }
 
 DOWNLOAD_TIMEOUT = 60
@@ -120,5 +122,8 @@ DOWNLOAD_TIMEOUT = 60
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# fake-useragent config
+RANDOM_USER_AGENT_TYPE = 'chrome'
 
 email_regex = r'([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)'

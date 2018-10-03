@@ -109,7 +109,7 @@ class ProxyIpPool:
         """检查ip是否可用"""
         self.validate_ip = False
         try:
-            res = requests.get('https://www.google.com/', proxies={'http': ip})
+            res = requests.get('https://www.google.com/search?q=jay', proxies={'http': ip})
         except:
             logger.debug(f'invalid proxy ip {ip}')
             return False

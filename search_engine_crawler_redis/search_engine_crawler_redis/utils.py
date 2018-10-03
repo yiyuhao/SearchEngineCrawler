@@ -107,7 +107,7 @@ class ProxyIpPool:
     def is_effective(ip):
         """检查ip是否可用"""
         try:
-            res = requests.get('https://www.google.com/search?q=led', proxies={'http': ip})
+            res = requests.get('https://www.bing.com/', proxies={'http': ip})
         except:
             logger.debug(f'invalid proxy ip {ip}')
             return False

@@ -129,8 +129,9 @@ class ProxyIpPool:
     def next_ip(self):
         if time.time() - self.fetch_datetime > 120:
             self.update_ips()
-            if not self.ips:
-                return None
+
+        if not self.ips:
+            return None
 
         next_index = 0
         if self.cur_index + 1 < len(self.ips):

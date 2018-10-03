@@ -78,7 +78,7 @@ class ItemBuilder:
         item_loader.add_value('search_request_id', self.search_request_id)
         item_loader.add_value('domain_name', self.domain_url)
         item_loader.add_value('website_title', self.title)
-        item_loader.add_value('website_ntroduction', self.description)
+        item_loader.add_value('website_ntroduction', self.description[:500])
         item_loader.add_value(field_name, value)
         item = item_loader.load_item()
 

@@ -8,7 +8,7 @@ from controller.config import request_priority_config
 from controller.item_builder import ItemBuilder
 from controller.task_scheduler import Scheduler
 from scrapy_redis.spiders import RedisSpider
-from utils import search_contact_us, need_ignoring
+from utils import ProxyIpPool, search_contact_us, need_ignoring
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ class SearchEngineSpider(RedisSpider):
     def __init__(self, *args, **kwargs):
         super(SearchEngineSpider, self).__init__(*args, **kwargs)
         self.task_scheduler = Scheduler(self)
+        self.ip_pool = ProxyIpPool()
 
     @staticmethod
     def _find_search_engine_result_links(response):
@@ -118,4 +119,5 @@ class SearchEngineSpider(RedisSpider):
 
             else:
                 for search_result_item in item_builder.build_items():
+                    logger.info(f'find an item: ({search_result_item})')
                     yield search_result_item

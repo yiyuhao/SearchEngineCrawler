@@ -2,7 +2,10 @@ import json
 import re
 import time
 from html.parser import HTMLParser
+from time import sleep
 
+import requests
+import logging
 from lxml.html.clean import Cleaner
 from scrapy.crawler import Settings
 
@@ -24,6 +27,8 @@ pattern_description = re.compile(r'<meta.*?name=[\'"]description[\'"].*?content=
 
 # the result of search engine that needed filter
 pattern_ignore = re.compile(r'wiki|baike|alibaba|amazon')
+
+logger = logging.getLogger(__name__)
 
 
 class HTMLStripper(HTMLParser):
@@ -62,6 +67,77 @@ class SearchResultDupefilter:
         added = self.server.zadd(self.key, expired_time, json.dumps(item))
 
         return added == 0
+
+
+class DefaultProxyIpApi:
+
+    def __init__(self):
+        self.url = 'http://api.66daili.cn/API/GetSecretProxy/?orderid=2761436131801403645' \
+                   '&num=20' \
+                   '&token=66daili' \
+                   '&format=json' \
+                   '&line_separator=win' \
+                   '&protocol=http' \
+                   '&region=overseas'
+
+    def pull_ips(self):
+        try:
+            result = requests.get(self.url)
+            ips = [f'http://{ip}' for ip in json.loads(result.text)['proxies']]
+            assert ips
+            return ips
+        except Exception as e:
+            logger.critical('can not get proxy ip')
+            return []
+
+
+class ProxyIpPool:
+
+    def __init__(self):
+
+        self.proxy_ip_api = DefaultProxyIpApi()
+
+        # ip列表
+        self.ips = []
+        self.cur_index = 0
+        self.fetch_datetime = time.time() - 1000  # need to pull ips
+
+    @staticmethod
+    def is_effective(ip):
+        """检查ip是否可用"""
+        try:
+            res = requests.get('https://www.google.com/', proxies={'http': ip})
+        except:
+            logger.debug(f'invalid proxy ip {ip}')
+            return False
+        else:
+            code = res.status_code
+            return True if 200 <= code < 300 else False
+
+    def update_ips(self):
+        self.ips = self.proxy_ip_api.pull_ips()
+        self.fetch_datetime = time.time()
+        self.cur_index = 0
+
+    @property
+    def next_ip(self):
+        if time.time() - self.fetch_datetime > 120 or not self.ips:
+            self.update_ips()
+            if not self.ips:
+                return None
+
+        next_index = 0
+        if self.cur_index + 1 < len(self.ips):
+            next_index = self.cur_index + 1
+
+        next_ip = self.ips[next_index]
+
+        if self.is_effective(next_ip):
+            self.cur_index = next_index
+            return next_ip
+
+        del self.ips[next_index]
+        return self.next_ip
 
 
 def strip_tags(html_text):

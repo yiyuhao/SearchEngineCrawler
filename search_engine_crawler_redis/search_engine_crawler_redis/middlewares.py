@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class RandomUserAgentDownloadMiddleware(object):
+    """random user-agent"""
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -28,6 +29,33 @@ class RandomUserAgentDownloadMiddleware(object):
 
     def process_request(self, request, spider):
         request.headers.setdefault('User-Agent', getattr(self.user_agent(), self.user_agent_type))
+        return None
+
+    def process_response(self, request, response, spider):
+        return response
+
+    def process_exception(self, request, exception, spider):
+        pass
+
+    def spider_opened(self, spider):
+        spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class RandomProxyIpDownloadMiddleware(object):
+    """random proxy ip"""
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        s = cls()
+        crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        return s
+
+    def process_request(self, request, spider):
+        if request.meta.get('depth', 0) == 0 and 'proxy' not in request.meta:  # search engine page use proxy ip
+            ip = spider.ip_pool.next_ip
+            if ip:
+                request.meta['proxy'] = ip
+                return request
         return None
 
     def process_response(self, request, response, spider):

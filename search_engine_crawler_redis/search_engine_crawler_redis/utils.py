@@ -98,18 +98,16 @@ class ProxyIpPool:
 
         self.proxy_ip_api = DefaultProxyIpApi()
 
-        self.validate_ip = True
-
         # ip列表
         self.ips = []
         self.cur_index = 0
         self.fetch_datetime = time.time() - 1000  # need to pull ips
 
-    def is_effective(self, ip):
+    @staticmethod
+    def is_effective(ip):
         """检查ip是否可用"""
-        self.validate_ip = False
         try:
-            res = requests.get('https://www.google.com/search?q=jay', proxies={'http': ip})
+            res = requests.get('https://www.google.com/search?q=led', proxies={'http': ip})
         except:
             logger.debug(f'invalid proxy ip {ip}')
             return False
@@ -121,7 +119,6 @@ class ProxyIpPool:
         self.ips = self.proxy_ip_api.pull_ips()
         self.fetch_datetime = time.time()
         self.cur_index = 0
-        self.validate_ip = True
 
     @property
     def next_ip(self):
@@ -135,10 +132,6 @@ class ProxyIpPool:
             next_index = self.cur_index + 1
 
         next_ip = self.ips[next_index]
-
-        if not self.validate_ip:
-            self.cur_index = next_index
-            return next_ip
 
         if self.is_effective(next_ip):
             self.cur_index = next_index

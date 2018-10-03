@@ -84,11 +84,11 @@ class DefaultProxyIpApi:
         try:
             result = requests.get(self.url)
             ips = [f'http://{ip}' for ip in json.loads(result.text)['proxies']]
-            logger.log(f'pull proxy ips: {ips}')
+            logger.debug(f'pull proxy ips: {ips}')
             assert ips
             return ips
         except Exception as e:
-            logger.critical('can not get proxy ip')
+            logger.critical(f'can not get proxy ip: {e}')
             return []
 
 
@@ -122,7 +122,7 @@ class ProxyIpPool:
 
     @property
     def next_ip(self):
-        if time.time() - self.fetch_datetime > 120 or not self.ips:
+        if time.time() - self.fetch_datetime > 120:
             self.update_ips()
             if not self.ips:
                 return None

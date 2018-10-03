@@ -55,6 +55,7 @@ class RandomProxyIpDownloadMiddleware(object):
             ip = spider.ip_pool.next_ip
             if ip:
                 request.meta['proxy'] = ip
+                logger.debug(f'use proxy ip {ip} for {request.url}')
                 return request
         return None
 

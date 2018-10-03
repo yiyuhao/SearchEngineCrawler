@@ -84,6 +84,7 @@ class DefaultProxyIpApi:
         try:
             result = requests.get(self.url)
             ips = [f'http://{ip}' for ip in json.loads(result.text)['proxies']]
+            logger.log(f'pull proxy ips: {ips}')
             assert ips
             return ips
         except Exception as e:

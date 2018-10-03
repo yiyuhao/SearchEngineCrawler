@@ -82,6 +82,7 @@ class ItemBuilder:
         item_loader.add_value(field_name, value)
         item = item_loader.load_item()
 
+        logger.info(f'find an item: ({item})')
         self.items_set.add(item)
 
     def build_email_items(self):

@@ -119,5 +119,5 @@ class SearchEngineSpider(RedisSpider):
 
             else:
                 for search_result_item in item_builder.build_items():
-                    logger.info(f'find an item: ({search_result_item})')
+                    logger.info(f'insert one search_detail: ({search_result_item})')
                     yield search_result_item

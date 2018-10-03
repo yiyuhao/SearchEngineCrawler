@@ -113,7 +113,12 @@ class ProxyIpPool:
             return False
         else:
             code = res.status_code
-            return True if 200 <= code < 300 else False
+            is_effective = True if 200 <= code < 300 else False
+
+            if not is_effective:
+                logger.debug(f'invalid proxy ip {ip}')
+
+            return is_effective
 
     def update_ips(self):
         self.ips = self.proxy_ip_api.pull_ips()

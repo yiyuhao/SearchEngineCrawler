@@ -2,7 +2,7 @@ import json
 import re
 import time
 from html.parser import HTMLParser
-
+from urllib.parse import unquote
 import requests
 import logging
 from lxml.html.clean import Cleaner
@@ -144,6 +144,20 @@ class ProxyIpPool:
 
         del self.ips[next_index]
         return self.next_ip
+
+
+def fetch_url(url):
+    """fetch url from r.search.yahoo"""
+    if 'r.search.yahoo' not in url:
+        return url
+
+    pattern_url = r'/RU=(.*?)/'
+    match = re.search(pattern_url, url)
+    if not match:
+        return url
+
+    redirect_url = unquote(match.group(1))
+    return redirect_url
 
 
 def strip_tags(html_text):

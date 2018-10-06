@@ -8,7 +8,7 @@ from controller.config import request_priority_config
 from controller.item_builder import ItemBuilder
 from controller.task_scheduler import Scheduler
 from scrapy_redis.spiders import RedisSpider
-from utils import ProxyIpPool, search_contact_us, need_ignoring
+from utils import ProxyIpPool, search_contact_us, need_ignoring, fetch_url
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class SearchEngineSpider(RedisSpider):
         for link in links:
             if not need_ignoring(link.url):
                 logger.info(f'yield a website homepage request ({link.url}) from ({response.url})')
-                yield scrapy.Request(url=link.url,
+                yield scrapy.Request(url=fetch_url(link.url),
                                      callback=self.craw_website,
                                      meta=response.meta,
                                      priority=request_priority_config.website_homepage)

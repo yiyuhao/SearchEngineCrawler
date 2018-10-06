@@ -10,11 +10,7 @@ class DBConnection:
         return MySQLdb.connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, charset='utf8')
 
     def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = cls.get_connection()
-        cls.instance.close()
-        if not cls.instance.open:
-            cls.instance = cls.get_connection()
+        cls.instance = cls.get_connection()
         return cls.instance
 
 

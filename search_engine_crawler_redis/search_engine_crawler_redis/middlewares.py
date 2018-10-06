@@ -51,13 +51,20 @@ class RandomProxyIpDownloadMiddleware(object):
         return s
 
     def process_request(self, request, spider):
-        if request.meta.get('depth', 0) == 0 and 'proxy' not in request.meta:  # search engine page use proxy ip
-            ip = spider.ip_pool.next_ip
-            if ip:
-                request.meta['proxy'] = ip
-                logger.debug(f'use proxy ip {ip} for {request.url}')
-                return request
-        return None
+        if 'yahoo' in request.url:
+            return None
+
+        if 'proxy' in request.meta:
+            return None
+
+        if request.meta.get('depth', 0) != 0:
+            return None
+
+        ip = spider.ip_pool.next_ip
+        if ip:
+            request.meta['proxy'] = ip
+            logger.debug(f'use proxy ip {ip} for {request.url}')
+            return request
 
     def process_response(self, request, response, spider):
         return response

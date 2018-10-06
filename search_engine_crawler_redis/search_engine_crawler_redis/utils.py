@@ -2,7 +2,6 @@ import json
 import re
 import time
 from html.parser import HTMLParser
-from time import sleep
 
 import requests
 import logging

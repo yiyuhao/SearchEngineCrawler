@@ -91,7 +91,8 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'search_engine_crawler_redis.middlewares.SearchEngineCrawlerRedisDownloaderMiddleware': 100,
-    #'search_engine_crawler_redis.middlewares.RandomUserAgentDownloadMiddleware': 200
+    # 'search_engine_crawler_redis.middlewares.RandomUserAgentDownloadMiddleware': 200,
+    # 'search_engine_crawler_redis.middlewares.RandomProxyIpDownloadMiddleware': 300,
 }
 
 DOWNLOAD_TIMEOUT = 60

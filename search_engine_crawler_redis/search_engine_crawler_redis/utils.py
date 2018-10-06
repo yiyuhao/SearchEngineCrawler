@@ -72,7 +72,7 @@ class SearchResultDupefilter:
 class DefaultProxyIpApi:
 
     def __init__(self):
-        self.url = 'http://api.66daili.cn/API/GetSecretProxy/?orderid=2761436131801403645' \
+        self.url = 'http://api.66daili.cn/API/GetSecretProxy/?orderid=2790028361801403643' \
                    '&num=20' \
                    '&token=66daili' \
                    '&format=json' \

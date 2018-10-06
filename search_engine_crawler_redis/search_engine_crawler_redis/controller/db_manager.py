@@ -27,7 +27,8 @@ class NationalConfigurationDBManager:
         with self.conn.cursor() as cursor:
             cursor.execute(self.query_sql)
             result = cursor.fetchall()
-            return result
+        self.conn.close()
+        return result
 
 
 class SearchRequestDBManager:
@@ -63,8 +64,9 @@ class SearchRequestDBManager:
             if result:
                 mark_fetched_sql, ids = self.get_mark_fetched_request_sql(result)
                 cursor.execute(mark_fetched_sql, ids)
+        self.conn.close()
 
-            return result
+        return result
 
     def has_stopped(self, search_request_id):
         sql = '''
@@ -75,4 +77,6 @@ class SearchRequestDBManager:
 
         with self.conn.cursor() as cursor:
             has_stopped = cursor.execute(sql, [search_request_id])
-            return True if has_stopped else False
+        self.conn.close()
+
+        return True if has_stopped else False

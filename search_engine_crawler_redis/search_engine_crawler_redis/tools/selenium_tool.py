@@ -23,9 +23,9 @@ def get_yahoo_cookies():
     # get cookies
     driver.get('https://uk.search.yahoo.com/search?pz=10&p=key&b=101')
     wait = WebDriverWait(driver, 10)
-    wait.until(lambda driver: 'oath' in driver.current_url)
+    wait.until(lambda driver: 'collectConsent' in driver.current_url)
 
-    driver.find_element_by_css_selector('div > input[type=submit]').click()
+    driver.find_element_by_css_selector('div > button[type=submit].btn.primary').click()
 
     cookies = driver.get_cookies()
     driver.close()

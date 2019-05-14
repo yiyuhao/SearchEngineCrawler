@@ -32,10 +32,10 @@ REDIS_PORT = 6379
 REDIS_ENCODING = 'utf-8'
 
 # mysql
-MYSQL_HOST = 'localhost'
+MYSQL_HOST = '103.118.206.194'
 MYSQL_DATABASE = 'ses'
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = '123456'
+MYSQL_USER = 'python'
+MYSQL_PASSWORD = 'python123qwe'
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html

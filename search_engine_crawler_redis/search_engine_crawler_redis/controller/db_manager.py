@@ -6,13 +6,16 @@ from DBUtils.PooledDB import PooledDB
 
 class DBPool:
     def __init__(self):
-        self.pool = PooledDB(MySQLdb, 5, host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASSWORD, database=MYSQL_DATABASE, port=3306)
-    
+        self.pool = PooledDB(MySQLdb, 5, host=MYSQL_HOST, user=MYSQL_USER, password=MYSQL_PASSWORD,
+                             database=MYSQL_DATABASE, port=3306)
+
     def connection(self):
         return self.pool.connection()
-        
+
+
 db_pool = DBPool()
-    
+
+
 class DBConnection:
 
     @classmethod
@@ -23,7 +26,6 @@ class DBConnection:
         cls.instance = cls.get_connection()
         return cls.instance
 
-        
 
 class NationalConfigurationDBManager:
     query_sql = '''
@@ -57,7 +59,7 @@ class SearchRequestDBManager:
 
     def __init__(self):
         self.conn = DBConnection()
-        
+
     @staticmethod
     def get_mark_fetched_request_sql(query_result):
         ids = list(set([item[1] for item in query_result]))

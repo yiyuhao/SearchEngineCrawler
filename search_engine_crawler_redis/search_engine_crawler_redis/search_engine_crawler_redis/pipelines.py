@@ -9,6 +9,7 @@ import MySQLdb
 import MySQLdb.cursors
 from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
+from twisted.python import log
 
 from utils import SearchResultDupefilter
 
@@ -16,6 +17,19 @@ from utils import SearchResultDupefilter
 class SearchEngineCrawlerRedisPipeline(object):
     def process_item(self, item, spider):
         return item
+
+
+class ReconnectingPool(adbapi.ConnectionPool):
+    def _runInteraction(self, interaction, *args, **kw):
+        try:
+            return adbapi.ConnectionPool._runInteraction(self, interaction, *args, **kw)
+        except MySQLdb.OperationalError as e:
+            if e[0] not in (2006, 2013):
+                raise
+            log.err("Lost connection to MySQL, retrying operation.  If no errors follow, retry was successful.")
+            conn = self.connections.get(self.threadID())
+            self.disconnect(conn)
+            return adbapi.ConnectionPool._runInteraction(self, interaction, *args, **kw)
 
 
 class DuplicatesPipeline(object):
@@ -46,7 +60,7 @@ class MysqlTwistedPipeline(object):
             cp_reconnect=True,
         )
 
-        db_pool = adbapi.ConnectionPool('MySQLdb', **params)
+        db_pool = ReconnectingPool('MySQLdb', **params)
 
         return cls(db_pool)
 

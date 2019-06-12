@@ -26,16 +26,20 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
 # Specify the host and port to use when connecting to Redis (optional).
-REDIS_HOST = 'localhost'
+REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
+# REDIS_PARAMS = { 
+#     'password': '123456', 
+# }
 
 REDIS_ENCODING = 'utf-8'
+
 
 # mysql
 MYSQL_HOST = '103.118.206.194'
 MYSQL_DATABASE = 'ses'
-MYSQL_USER = 'python'
-MYSQL_PASSWORD = 'python123qwe'
+MYSQL_USER = 'chenlinpeng'
+MYSQL_PASSWORD = 'chenlinpeng1992'
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html

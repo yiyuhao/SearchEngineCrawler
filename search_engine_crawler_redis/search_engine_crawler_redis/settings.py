@@ -9,6 +9,9 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
+CLUSTER_NUM = 2
+SELF_NO = 0  # 0, 1, 2, 3
+
 BOT_NAME = 'search_engine_crawler_redis'
 
 SPIDER_MODULES = ['search_engine_crawler_redis.spiders']

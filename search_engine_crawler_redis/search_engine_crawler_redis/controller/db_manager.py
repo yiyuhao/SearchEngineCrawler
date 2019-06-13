@@ -1,7 +1,7 @@
 import MySQLdb
-
-from settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
 from DBUtils.PooledDB import PooledDB
+
+from settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, CLUSTER_NUM, SELF_NO
 
 
 class DBPool:
@@ -47,13 +47,13 @@ class NationalConfigurationDBManager:
 
 
 class SearchRequestDBManager:
-    query_sql = '''
+    query_sql = f'''
         SELECT b.national_configuration_id AS country_id, a.id, a.key_word, a.collection_number,
             a.filter_words,a.inclusion_words, a.email_collection,a.phone_collection, a.url_collection,
             a.facebook_collection, a.company_name_collection, a.company_profile_collection
         FROM search_request a INNER JOIN search_country_relationship b
         ON a.id = b.search_request_id AND a.del_flag = 0
-        where mod(a.id,2)=0
+        where mod(a.id, {CLUSTER_NUM})={SELF_NO}
         ORDER BY 'create_date';
     '''
 

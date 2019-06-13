@@ -12,6 +12,8 @@ class Rule:
                  filter_words, inclusion_words,
                  email_collection, phone_collection, url_collection,
                  facebook_collection, company_name_collection, company_profile_collection):
+        """一个Rule对应一次抓取任务, 将生成多个(多个搜索引擎)scrapy.Request放入待爬队列"""
+        
         self.spider = spider
         self.engine = SearchEngine(country_id)
         self.search_request_id = search_request_id

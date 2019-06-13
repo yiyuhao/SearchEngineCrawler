@@ -1,4 +1,5 @@
 import time
+
 from controller.db_manager import SearchRequestDBManager
 from controller.search_rule import Rule
 
@@ -10,6 +11,10 @@ class Scheduler:
         self.scrapy_requests = {}
         self.cur_request_id = None
         self.request_updated_time = time.time()
+
+    @property
+    def scrapy_requests_length(self):
+        return len(self.scrapy_requests)
 
     @property
     def next_request_id(self):
@@ -37,10 +42,9 @@ class Scheduler:
         id_ = request.meta['search_request_id']
         request_list = self.scrapy_requests.get(id_)
         if not request_list:
-            request_list = []
-            self.scrapy_requests[id_] = request_list
+            self.scrapy_requests[id_] = []
 
-        request_list.append(request)
+        self.scrapy_requests[id_].append(request)
 
     def _fetch_one(self):
         if not self.scrapy_requests:

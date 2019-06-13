@@ -29,11 +29,11 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
 # Specify the host and port to use when connecting to Redis (optional).
-REDIS_HOST = '102.129.175.251'
+REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
-REDIS_PARAMS = { 
-    'password': 'chenlinpeng1992', 
-}
+# REDIS_PARAMS = {
+#     'password': 'chenlinpeng1992',
+# }
 
 REDIS_ENCODING = 'utf-8'
 

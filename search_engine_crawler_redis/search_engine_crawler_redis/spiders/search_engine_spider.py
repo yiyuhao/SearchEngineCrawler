@@ -5,6 +5,7 @@ import scrapy
 from scrapy.linkextractor import LinkExtractor
 
 from controller.config import request_priority_config
+from controller.db_manager import async_db_pool
 from controller.item_builder import ItemBuilder
 from controller.task_scheduler import Scheduler
 from scrapy_redis.spiders import RedisSpider
@@ -38,6 +39,8 @@ class SearchEngineSpider(RedisSpider):
 
     def next_requests(self):
         """Returns a request to be scheduled or none."""
+
+        async_db_pool.keep_connection_please()
 
         request_num = 0
         while request_num < self.redis_batch_size:

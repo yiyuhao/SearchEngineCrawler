@@ -5,30 +5,15 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-import MySQLdb
-import MySQLdb.cursors
 from scrapy.exceptions import DropItem
-from twisted.enterprise import adbapi
-from twisted.python import log
 
+from controller.db_manager import async_db_pool
 from utils import SearchResultDupefilter
 
 
 class SearchEngineCrawlerRedisPipeline(object):
     def process_item(self, item, spider):
         return item
-
-
-class ReconnectingPool(adbapi.ConnectionPool):
-    def _runInteraction(self, interaction, *args, **kw):
-        try:
-            return adbapi.ConnectionPool._runInteraction(self, interaction, *args, **kw)
-        except MySQLdb.OperationalError as e:
-            log.err("Lost connection to MySQL, retrying operation.  If no errors follow, retry was successful. ")
-            log.err(e)
-            conn = self.connections.get(self.threadID())
-            self.disconnect(conn)
-            return adbapi.ConnectionPool._runInteraction(self, interaction, *args, **kw)
 
 
 class DuplicatesPipeline(object):
@@ -48,18 +33,7 @@ class MysqlTwistedPipeline(object):
 
     @classmethod
     def from_settings(cls, settings):
-        params = dict(
-            host=settings['MYSQL_HOST'],
-            database=settings['MYSQL_DATABASE'],
-            user=settings['MYSQL_USER'],
-            password=settings['MYSQL_PASSWORD'],
-            charset='utf8',
-            cursorclass=MySQLdb.cursors.DictCursor,
-            use_unicode=True,
-            cp_reconnect=True,
-        )
-
-        db_pool = ReconnectingPool('MySQLdb', **params)
+        db_pool = async_db_pool
 
         return cls(db_pool)
 

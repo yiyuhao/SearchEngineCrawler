@@ -1,7 +1,13 @@
+from time import time
+
 import MySQLdb
+import MySQLdb.cursors
 from DBUtils.PooledDB import PooledDB
+from twisted.enterprise import adbapi
+from twisted.python import log
 
 from settings import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, CLUSTER_NUM, SELF_NO
+from settings import PING_DB_SERVER_INTERVAL
 
 
 class DBPool:
@@ -14,6 +20,47 @@ class DBPool:
 
 
 db_pool = DBPool()
+
+
+class ReconnectingPool(adbapi.ConnectionPool):
+    def __init__(self, *args, **kwargs):
+        super(ReconnectingPool, self).__init__(*args, **kwargs)
+        self.last_ping = time()
+
+    @staticmethod
+    def _do_select_ping(cursor):
+
+        cursor.execute('SELECT 1;')
+
+    def _runInteraction(self, interaction, *args, **kw):
+        try:
+            return adbapi.ConnectionPool._runInteraction(self, interaction, *args, **kw)
+        except MySQLdb.OperationalError as e:
+            log.err("Lost connection to MySQL, retrying operation.  If no errors follow, retry was successful. ")
+            log.err(e)
+            conn = self.connections.get(self.threadID())
+            self.disconnect(conn)
+            return adbapi.ConnectionPool._runInteraction(self, interaction, *args, **kw)
+
+    def keep_connection_please(self):
+        now = time()
+        if now - self.last_ping > PING_DB_SERVER_INTERVAL:
+            self.runInteraction(self._do_select_ping)
+            self.last_ping = time()
+
+
+params = dict(
+    host=MYSQL_HOST,
+    database=MYSQL_DATABASE,
+    user=MYSQL_USER,
+    password=MYSQL_PASSWORD,
+    charset='utf8',
+    cursorclass=MySQLdb.cursors.DictCursor,
+    use_unicode=True,
+    cp_reconnect=True,
+)
+
+async_db_pool = ReconnectingPool('MySQLdb', **params)
 
 
 class DBConnection:

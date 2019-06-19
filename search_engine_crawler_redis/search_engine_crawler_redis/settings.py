@@ -63,6 +63,8 @@ SEARCH_RESULT_ITEM_TTL = 30 * 60
 # 已停止search_request_id去重TTL
 STOPPED_SEARCH_REQUEST_TTL = 60 * 60
 
+PING_DB_SERVER_INTERVAL = 60 * 60
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 16
 
